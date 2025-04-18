@@ -5,13 +5,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Send, User, Bot } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { useUserPreferences, ActivityType, DateRange } from "@/contexts/UserPreferencesContext";
+import { useUserPreferences, DateRange } from "@/contexts/UserPreferencesContext";
 import { useNavigate } from "react-router-dom";
 import { cities } from "@/data/cities";
 import { activities } from "@/data/activities";
@@ -37,7 +36,6 @@ const ChatBot = () => {
   const { updatePreferences, setChatCompleted, preferences } = useUserPreferences();
   const navigate = useNavigate();
 
-  // Initial message
   useEffect(() => {
     setTimeout(() => {
       setMessages([
@@ -55,16 +53,14 @@ const ChatBot = () => {
     if (chatStep === 8) {
       setTimeout(() => {
         navigate("/dashboard");
-      }, 2000); // Wait 2 seconds before redirecting to let user read the final message
+      }, 2000);
     }
   }, [chatStep, navigate]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle sending text message
   const handleSendMessage = () => {
     if (inputValue.trim() === "") return;
 
@@ -77,11 +73,9 @@ const ChatBot = () => {
     setMessages((prev) => [...prev, newUserMessage]);
     setInputValue("");
     
-    // Process user response based on current chat step
     processUserResponse(newUserMessage);
   };
 
-  // Simulate bot typing
   const simulateBotTyping = (callback: () => void) => {
     setIsTyping(true);
     setTimeout(() => {
@@ -90,10 +84,9 @@ const ChatBot = () => {
     }, 1000);
   };
 
-  // Process user response and continue chat flow
   const processUserResponse = (message: Message) => {
     switch (chatStep) {
-      case 0: // City selection
+      case 0:
         simulateBotTyping(() => {
           updatePreferences({ selectedCity: message.text });
           setMessages((prev) => [
@@ -108,7 +101,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 1: // Name input
+      case 1:
         simulateBotTyping(() => {
           updatePreferences({ name: message.text });
           setMessages((prev) => [
@@ -123,7 +116,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 2: // Email input
+      case 2:
         simulateBotTyping(() => {
           updatePreferences({ email: message.text });
           setMessages((prev) => [
@@ -139,7 +132,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 3: // Date has been selected in calendar component
+      case 3:
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -154,7 +147,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 4: // Activities have been selected
+      case 4:
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -169,7 +162,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 5: // Group size has been selected
+      case 5:
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -184,7 +177,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 6: // Budget has been selected
+      case 6:
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -199,7 +192,7 @@ const ChatBot = () => {
         });
         break;
       
-      case 7: // Special requirements
+      case 7:
         simulateBotTyping(() => {
           updatePreferences({ specialRequirements: message.text });
           setMessages((prev) => [
@@ -220,12 +213,10 @@ const ChatBot = () => {
     }
   };
 
-  // Handle date selection
   const handleDateSelect = (range: DateRange) => {
     setDateRange(range);
     updatePreferences({ dateRange: range });
     
-    // If both dates are selected
     if (range.from && range.to) {
       const formattedFrom = format(range.from, 'dd MMMM yyyy', { locale: fr });
       const formattedTo = format(range.to, 'dd MMMM yyyy', { locale: fr });
@@ -239,7 +230,6 @@ const ChatBot = () => {
         }
       ]);
       
-      // Move to next step
       processUserResponse({
         id: Date.now().toString(),
         text: `Du ${formattedFrom} au ${formattedTo}`,
@@ -248,7 +238,6 @@ const ChatBot = () => {
     }
   };
 
-  // Handle activity selection
   const handleActivitySelect = (activityId: string) => {
     setSelectedActivities((prev) => {
       if (prev.includes(activityId)) {
@@ -259,24 +248,21 @@ const ChatBot = () => {
     
     updatePreferences({ selectedActivities: [...selectedActivities, activityId] });
     
-    // Add confirmation message
     setMessages((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
-        text: `Activité ajoutée à votre programme !`,
+        text: "Activité ajoutée à votre programme !",
         sender: "bot"
       }
     ]);
 
-    // Wait a moment then redirect to dashboard
     setTimeout(() => {
       setChatCompleted(true);
       navigate("/dashboard");
     }, 1500);
   };
 
-  // Handle activity submission
   const handleActivitiesSubmit = () => {
     if (selectedActivities.length === 0) return;
     
@@ -296,7 +282,6 @@ const ChatBot = () => {
       }
     ]);
     
-    // Move to next step
     processUserResponse({
       id: Date.now().toString(),
       text: activitiesText,
@@ -304,7 +289,6 @@ const ChatBot = () => {
     });
   };
 
-  // Handle group size selection
   const handleGroupSizeSubmit = () => {
     updatePreferences({ groupSize });
     
@@ -317,7 +301,6 @@ const ChatBot = () => {
       }
     ]);
     
-    // Move to next step
     processUserResponse({
       id: Date.now().toString(),
       text: groupSize.toString(),
@@ -325,7 +308,6 @@ const ChatBot = () => {
     });
   };
 
-  // Handle budget selection
   const handleBudgetSubmit = () => {
     updatePreferences({ budget });
     
@@ -338,7 +320,6 @@ const ChatBot = () => {
       }
     ]);
     
-    // Move to next step
     processUserResponse({
       id: Date.now().toString(),
       text: budget,
@@ -346,7 +327,6 @@ const ChatBot = () => {
     });
   };
 
-  // Handle special requirements submission
   const handleSpecialSubmit = (text: string) => {
     if (text.trim() === "") text = "Pas d'exigences particulières";
     
@@ -359,7 +339,6 @@ const ChatBot = () => {
       }
     ]);
     
-    // Move to next step
     processUserResponse({
       id: Date.now().toString(),
       text: text,
@@ -367,12 +346,10 @@ const ChatBot = () => {
     });
   };
 
-  // Go to dashboard after completing chat
   const handleGoToDashboard = () => {
     navigate("/dashboard");
   };
 
-  // Update the render to include Map for activity selection when needed
   return (
     <div className="relative w-full max-w-3xl mx-auto h-full flex flex-col bg-white rounded-lg shadow-lg">
       <div className="p-4 bg-primary text-white rounded-t-lg">
