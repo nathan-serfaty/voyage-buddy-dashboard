@@ -12,7 +12,7 @@ const Index = () => {
             Voyagez avec SGM
           </h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto">
-            Découvrez nos excursions uniques et créez votre voyage sur mesure
+            Découvrez nos excursions uniques en Tunisie et créez votre voyage sur mesure
           </p>
         </div>
       </div>
@@ -20,7 +20,7 @@ const Index = () => {
       <div className="container mx-auto px-4 py-10 flex-1 flex flex-col">
         <div className="text-center mb-10">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Comment pouvons-nous vous aider à explorer le Maroc ?
+            Comment pouvons-nous vous aider à explorer la Tunisie ?
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Notre assistant de voyage interactif est prêt à vous aider à planifier votre aventure idéale. Partagez vos préférences et nous vous proposerons des expériences adaptées.
