@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,15 +13,16 @@ import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useUserPreferences, ActivityType, DateRange } from "@/contexts/UserPreferencesContext";
 import { useNavigate } from "react-router-dom";
+import { cities } from "@/data/cities";
 
 type Message = {
   id: string;
   text: string;
   sender: "bot" | "user";
-  inputType?: "text" | "date" | "activities" | "groupSize" | "budget" | "special";
+  inputType?: "text" | "date" | "activities" | "groupSize" | "budget" | "special" | "city";
 };
 
-export const ChatBot = () => {
+const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [chatStep, setChatStep] = useState(0);
@@ -41,8 +41,9 @@ export const ChatBot = () => {
       setMessages([
         {
           id: "1",
-          text: "Bonjour ! Je suis votre assistant de voyage SGM. Je vais vous aider à planifier votre prochaine aventure au Maroc. Pour commencer, quel est votre nom ?",
-          sender: "bot"
+          text: "Bonjour ! Je suis votre assistant de voyage SGM. Pour commencer, quelle ville souhaitez-vous visiter ?",
+          sender: "bot",
+          inputType: "city"
         }
       ]);
     }, 500);
@@ -82,7 +83,22 @@ export const ChatBot = () => {
   // Process user response and continue chat flow
   const processUserResponse = (message: Message) => {
     switch (chatStep) {
-      case 0: // Name input
+      case 0: // City selection
+        simulateBotTyping(() => {
+          updatePreferences({ selectedCity: message.text });
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: `Excellent choix ! Maintenant, pouvez-vous me donner votre nom ?`,
+              sender: "bot"
+            }
+          ]);
+          setChatStep(1);
+        });
+        break;
+      
+      case 1: // Name input
         simulateBotTyping(() => {
           updatePreferences({ name: message.text });
           setMessages((prev) => [
@@ -93,11 +109,11 @@ export const ChatBot = () => {
               sender: "bot"
             }
           ]);
-          setChatStep(1);
+          setChatStep(2);
         });
         break;
       
-      case 1: // Email input
+      case 2: // Email input
         simulateBotTyping(() => {
           updatePreferences({ email: message.text });
           setMessages((prev) => [
@@ -109,11 +125,11 @@ export const ChatBot = () => {
               inputType: "date"
             }
           ]);
-          setChatStep(2);
+          setChatStep(3);
         });
         break;
       
-      case 2: // Date has been selected in calendar component
+      case 3: // Date has been selected in calendar component
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -124,11 +140,11 @@ export const ChatBot = () => {
               inputType: "activities"
             }
           ]);
-          setChatStep(3);
+          setChatStep(4);
         });
         break;
       
-      case 3: // Activities have been selected
+      case 4: // Activities have been selected
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -139,11 +155,11 @@ export const ChatBot = () => {
               inputType: "groupSize"
             }
           ]);
-          setChatStep(4);
+          setChatStep(5);
         });
         break;
       
-      case 4: // Group size has been selected
+      case 5: // Group size has been selected
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -154,11 +170,11 @@ export const ChatBot = () => {
               inputType: "budget"
             }
           ]);
-          setChatStep(5);
+          setChatStep(6);
         });
         break;
       
-      case 5: // Budget has been selected
+      case 6: // Budget has been selected
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -169,11 +185,11 @@ export const ChatBot = () => {
               inputType: "special"
             }
           ]);
-          setChatStep(6);
+          setChatStep(7);
         });
         break;
       
-      case 6: // Special requirements
+      case 7: // Special requirements
         simulateBotTyping(() => {
           updatePreferences({ specialRequirements: message.text });
           setMessages((prev) => [
@@ -184,7 +200,7 @@ export const ChatBot = () => {
               sender: "bot"
             }
           ]);
-          setChatStep(7);
+          setChatStep(8);
           setChatCompleted(true);
         });
         break;
@@ -370,6 +386,38 @@ export const ChatBot = () => {
                   {message.text}
                   
                   {/* Render specialized inputs based on inputType */}
+                  {message.inputType === "city" && (
+                    <div className="mt-3 space-y-3">
+                      <div className="grid grid-cols-2 gap-2">
+                        {cities.map((city) => (
+                          <Button
+                            key={city.id}
+                            variant="outline"
+                            onClick={() => {
+                              setMessages((prev) => [
+                                ...prev,
+                                {
+                                  id: Date.now().toString(),
+                                  text: city.name,
+                                  sender: "user"
+                                }
+                              ]);
+                              processUserResponse({
+                                id: Date.now().toString(),
+                                text: city.id,
+                                sender: "user"
+                              });
+                            }}
+                            className="flex flex-col items-start p-4"
+                          >
+                            <span className="font-bold">{city.name}</span>
+                            <span className="text-sm text-gray-500">{city.description}</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {message.inputType === "date" && (
                     <div className="mt-3">
                       <Popover>
@@ -570,7 +618,7 @@ export const ChatBot = () => {
       </div>
       
       {/* Chat input */}
-      {chatStep === 0 || chatStep === 1 ? (
+      {chatStep === 1 || chatStep === 2 ? (
         <div className="p-4 border-t">
           <form
             onSubmit={(e) => {
@@ -582,7 +630,7 @@ export const ChatBot = () => {
             <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={chatStep === 0 ? "Votre nom..." : "Votre email..."}
+              placeholder={chatStep === 1 ? "Votre nom..." : "Votre email..."}
               className="flex-1"
             />
             <Button type="submit" size="icon">
@@ -590,7 +638,7 @@ export const ChatBot = () => {
             </Button>
           </form>
         </div>
-      ) : chatStep === 7 ? (
+      ) : chatStep === 8 ? (
         <div className="p-4 border-t">
           <Button 
             onClick={handleGoToDashboard} 

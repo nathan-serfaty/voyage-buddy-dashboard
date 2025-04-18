@@ -1,7 +1,5 @@
-
 import { createContext, useContext, useState, ReactNode } from "react";
 
-// Types for user preferences
 export type ActivityType = "cultural" | "adventure" | "relaxation" | "gastronomy" | "nature";
 
 export interface DateRange {
@@ -12,6 +10,7 @@ export interface DateRange {
 export interface UserPreferences {
   name: string;
   email: string;
+  selectedCity: string;
   activityTypes: ActivityType[];
   budget: string;
   groupSize: number;
@@ -20,10 +19,10 @@ export interface UserPreferences {
   specialRequirements: string;
 }
 
-// Default empty preferences
 const defaultPreferences: UserPreferences = {
   name: "",
   email: "",
+  selectedCity: "",
   activityTypes: [],
   budget: "",
   groupSize: 1,
@@ -32,7 +31,6 @@ const defaultPreferences: UserPreferences = {
   specialRequirements: ""
 };
 
-// Context type
 interface UserPreferencesContextType {
   preferences: UserPreferences;
   updatePreferences: (updates: Partial<UserPreferences>) => void;
@@ -41,10 +39,8 @@ interface UserPreferencesContextType {
   setChatCompleted: (completed: boolean) => void;
 }
 
-// Create context
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
 
-// Provider component
 export const UserPreferencesProvider = ({ children }: { children: ReactNode }) => {
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
   const [chatCompleted, setChatCompleted] = useState(false);
@@ -71,7 +67,6 @@ export const UserPreferencesProvider = ({ children }: { children: ReactNode }) =
   );
 };
 
-// Hook for using the context
 export const useUserPreferences = () => {
   const context = useContext(UserPreferencesContext);
   if (context === undefined) {
