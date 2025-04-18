@@ -268,6 +268,12 @@ const ChatBot = () => {
         sender: "bot"
       }
     ]);
+
+    // Wait a moment then redirect to dashboard
+    setTimeout(() => {
+      setChatCompleted(true);
+      navigate("/dashboard");
+    }, 1500);
   };
 
   // Handle activity submission
