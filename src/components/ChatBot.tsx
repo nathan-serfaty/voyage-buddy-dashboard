@@ -51,6 +51,14 @@ const ChatBot = () => {
     }, 500);
   }, []);
 
+  useEffect(() => {
+    if (chatStep === 8) {
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000); // Wait 2 seconds before redirecting to let user read the final message
+    }
+  }, [chatStep, navigate]);
+
   // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -624,12 +632,10 @@ const ChatBot = () => {
         </div>
       ) : chatStep === 8 ? (
         <div className="p-4 border-t">
-          <Button 
-            onClick={handleGoToDashboard} 
-            className="w-full"
-          >
-            Voir mon tableau de bord personnalisé
-          </Button>
+          <p className="text-center text-gray-600 mb-2">Redirection vers votre tableau de bord...</p>
+          <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div className="h-full bg-primary animate-progress" style={{ width: '100%' }} />
+          </div>
         </div>
       ) : null}
     </div>
