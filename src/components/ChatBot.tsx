@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { useUserPreferences, ActivityType, DateRange } from "@/contexts/UserPreferencesContext";
 import { useNavigate } from "react-router-dom";
 import { cities } from "@/data/cities";
+import { activities } from "@/data/activities";
+import Map from "@/components/Map";
 
 type Message = {
   id: string;
@@ -27,12 +29,12 @@ const ChatBot = () => {
   const [inputValue, setInputValue] = useState("");
   const [chatStep, setChatStep] = useState(0);
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
-  const [selectedActivities, setSelectedActivities] = useState<ActivityType[]>([]);
+  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [groupSize, setGroupSize] = useState<number>(1);
   const [budget, setBudget] = useState<string>("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { updatePreferences, setChatCompleted } = useUserPreferences();
+  const { updatePreferences, setChatCompleted, preferences } = useUserPreferences();
   const navigate = useNavigate();
 
   // Initial message
@@ -239,29 +241,36 @@ const ChatBot = () => {
   };
 
   // Handle activity selection
-  const handleActivitySelect = (activity: ActivityType, checked: boolean) => {
-    if (checked) {
-      setSelectedActivities((prev) => [...prev, activity]);
-    } else {
-      setSelectedActivities((prev) => prev.filter(a => a !== activity));
-    }
+  const handleActivitySelect = (activityId: string) => {
+    setSelectedActivities((prev) => {
+      if (prev.includes(activityId)) {
+        return prev.filter(id => id !== activityId);
+      }
+      return [...prev, activityId];
+    });
+    
+    updatePreferences({ selectedActivities: [...selectedActivities, activityId] });
+    
+    // Add confirmation message
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        text: `Activité ajoutée à votre programme !`,
+        sender: "bot"
+      }
+    ]);
   };
 
   // Handle activity submission
   const handleActivitiesSubmit = () => {
     if (selectedActivities.length === 0) return;
     
-    updatePreferences({ activityTypes: selectedActivities });
+    updatePreferences({ selectedActivities: selectedActivities });
     
-    const activitiesText = selectedActivities.map(activity => {
-      switch (activity) {
-        case "cultural": return "Culturel";
-        case "adventure": return "Aventure";
-        case "relaxation": return "Relaxation";
-        case "gastronomy": return "Gastronomie";
-        case "nature": return "Nature";
-        default: return activity;
-      }
+    const activitiesText = selectedActivities.map(activityId => {
+      const activity = activities.find(a => a.id === activityId);
+      return activity ? activity.title : 'Unknown Activity';
     }).join(", ");
     
     setMessages((prev) => [
@@ -349,6 +358,7 @@ const ChatBot = () => {
     navigate("/dashboard");
   };
 
+  // Update the render to include Map for activity selection when needed
   return (
     <div className="relative w-full max-w-3xl mx-auto h-full flex flex-col bg-white rounded-lg shadow-lg">
       <div className="p-4 bg-primary text-white rounded-t-lg">
@@ -356,7 +366,6 @@ const ChatBot = () => {
         <p className="text-sm opacity-80">Je vous aide à planifier votre voyage idéal</p>
       </div>
       
-      {/* Chat messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
@@ -385,9 +394,8 @@ const ChatBot = () => {
                 <div>
                   {message.text}
                   
-                  {/* Render specialized inputs based on inputType */}
                   {message.inputType === "city" && (
-                    <div className="mt-3 space-y-3">
+                    <div className="mt-3">
                       <div className="grid grid-cols-2 gap-2">
                         {cities.map((city) => (
                           <Button
@@ -458,67 +466,45 @@ const ChatBot = () => {
                   )}
                   
                   {message.inputType === "activities" && (
-                    <div className="mt-3 space-y-3">
-                      <div className="space-y-2">
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="cultural" 
-                              checked={selectedActivities.includes("cultural")}
-                              onCheckedChange={(checked) => 
-                                handleActivitySelect("cultural", checked as boolean)
-                              }
-                            />
-                            <Label htmlFor="cultural">Culturel (visites, histoire, patrimoine)</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="adventure" 
-                              checked={selectedActivities.includes("adventure")}
-                              onCheckedChange={(checked) => 
-                                handleActivitySelect("adventure", checked as boolean)
-                              }
-                            />
-                            <Label htmlFor="adventure">Aventure (randonnées, sports, 4x4)</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="relaxation" 
-                              checked={selectedActivities.includes("relaxation")}
-                              onCheckedChange={(checked) => 
-                                handleActivitySelect("relaxation", checked as boolean)
-                              }
-                            />
-                            <Label htmlFor="relaxation">Relaxation (plages, croisières, détente)</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="gastronomy" 
-                              checked={selectedActivities.includes("gastronomy")}
-                              onCheckedChange={(checked) => 
-                                handleActivitySelect("gastronomy", checked as boolean)
-                              }
-                            />
-                            <Label htmlFor="gastronomy">Gastronomie (cours de cuisine, dégustations)</Label>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Checkbox 
-                              id="nature" 
-                              checked={selectedActivities.includes("nature")}
-                              onCheckedChange={(checked) => 
-                                handleActivitySelect("nature", checked as boolean)
-                              }
-                            />
-                            <Label htmlFor="nature">Nature (parcs, réserves, paysages)</Label>
+                    <div className="mt-3">
+                      <div className="w-full h-[400px] rounded-lg overflow-hidden mb-4">
+                        <Map 
+                          selectedCity={preferences.selectedCity}
+                          onActivitySelect={handleActivitySelect}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      {selectedActivities.length > 0 && (
+                        <div className="mt-4">
+                          <h3 className="font-semibold mb-2">Activités sélectionnées:</h3>
+                          <div className="grid grid-cols-2 gap-2">
+                            {selectedActivities.map((activityId) => {
+                              const activity = activities.find(a => a.id === activityId);
+                              if (!activity) return null;
+                              return (
+                                <div key={activity.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                  <img 
+                                    src={activity.image} 
+                                    alt={activity.title} 
+                                    className="w-12 h-12 rounded object-cover"
+                                  />
+                                  <div>
+                                    <p className="font-medium text-sm">{activity.title}</p>
+                                    <p className="text-xs text-gray-500">{activity.price}€</p>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-                        <Button 
-                          onClick={handleActivitiesSubmit}
-                          disabled={selectedActivities.length === 0}
-                        >
-                          Valider
-                        </Button>
-                      </div>
+                      )}
+                      <Button 
+                        onClick={handleActivitiesSubmit}
+                        disabled={selectedActivities.length === 0}
+                        className="mt-4"
+                      >
+                        Valider
+                      </Button>
                     </div>
                   )}
                   
@@ -596,7 +582,6 @@ const ChatBot = () => {
           </div>
         ))}
         
-        {/* Bot typing indicator */}
         {isTyping && (
           <div className="flex justify-start">
             <div className="max-w-md p-3 rounded-lg bg-muted">
@@ -617,7 +602,6 @@ const ChatBot = () => {
         <div ref={messagesEndRef} />
       </div>
       
-      {/* Chat input */}
       {chatStep === 1 || chatStep === 2 ? (
         <div className="p-4 border-t">
           <form
