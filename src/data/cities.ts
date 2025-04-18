@@ -3,7 +3,7 @@ export interface City {
   id: string;
   name: string;
   description: string;
-  coordinates: [number, number];
+  coordinates: [number, number]; // Updated to proper tuple type [latitude, longitude]
 }
 
 export const cities: City[] = [

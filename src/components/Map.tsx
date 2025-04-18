@@ -20,7 +20,10 @@ const Map = ({ selectedCity, className }: MapProps) => {
     mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbHM0Z3UwejkwMXgwMmpwOWY5ZjJ0dXY3In0.O9pxg_OoVcjtFYbVSPVDcw';
     
     const selectedCityData = cities.find(city => city.id === selectedCity);
-    const center = selectedCityData ? selectedCityData.coordinates : [9.5375, 33.8869];
+    // Fix: Ensure coordinates are in the correct format [lng, lat]
+    const center: [number, number] = selectedCityData 
+      ? [selectedCityData.coordinates[1], selectedCityData.coordinates[0]] 
+      : [10.8451, 33.8075]; // Default to Djerba coordinates
     const zoom = selectedCityData ? 12 : 6;
 
     map.current = new mapboxgl.Map({
@@ -35,10 +38,13 @@ const Map = ({ selectedCity, className }: MapProps) => {
 
     // Add markers for cities
     cities.forEach((city) => {
+      // Fix: Ensure coordinates are in the correct format [lng, lat]
+      const markerPosition: [number, number] = [city.coordinates[1], city.coordinates[0]];
+      
       const marker = new mapboxgl.Marker({
         color: city.id === selectedCity ? '#ef4444' : '#3b82f6'
       })
-        .setLngLat(city.coordinates)
+        .setLngLat(markerPosition)
         .setPopup(new mapboxgl.Popup().setHTML(`
           <h3 class="font-bold">${city.name}</h3>
           <p>${city.description}</p>
