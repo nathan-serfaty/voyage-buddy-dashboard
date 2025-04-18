@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,38 +7,32 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Calendar, MapPin, Users, Clock, CalendarDays, Wallet, User2, Mail } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, CalendarDays, Wallet, User2, Mail, FileText, Download } from "lucide-react";
 import { activities, Activity } from "@/data/activities";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
+import { exportUserData } from "@/utils/exportUtils";
 
 const Dashboard = () => {
   const { preferences, chatCompleted } = useUserPreferences();
   const navigate = useNavigate();
   
-  // Redirect if chat not completed
   useEffect(() => {
     if (!chatCompleted) {
       navigate("/");
     }
   }, [chatCompleted, navigate]);
 
-  // Get selected activities details
   const selectedActivitiesDetails: Activity[] = activities.filter(
     activity => preferences.selectedActivities.includes(activity.id)
   );
 
-  // Get recommended activities based on user preferences
   const recommendedActivities = activities.filter(activity => 
-    // Match activity types with user preferences
     activity.type.some(type => preferences.activityTypes.includes(type as any)) &&
-    // Exclude already selected activities
     !preferences.selectedActivities.includes(activity.id) &&
-    // Match group size requirements
     activity.groupSize.min <= preferences.groupSize &&
     activity.groupSize.max >= preferences.groupSize
   ).slice(0, 3);
 
-  // Get formatted travel dates
   const getFormattedDateRange = () => {
     if (preferences.dateRange.from && preferences.dateRange.to) {
       return `Du ${format(preferences.dateRange.from, 'dd MMMM yyyy', { locale: fr })} au ${format(preferences.dateRange.to, 'dd MMMM yyyy', { locale: fr })}`;
@@ -47,7 +40,6 @@ const Dashboard = () => {
     return "Dates non définies";
   };
 
-  // Translate activity type to French
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "cultural": return "Culturel";
@@ -63,9 +55,27 @@ const Dashboard = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold mb-2">Votre tableau de bord de voyage</h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 mb-4">
           Consultez vos préférences et vos activités sélectionnées
         </p>
+        <div className="flex justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportUserData(preferences, 'csv')}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Exporter en CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportUserData(preferences, 'xlsx')}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Exporter en Excel
+          </Button>
+        </div>
       </div>
       
       <Tabs defaultValue="overview" className="space-y-6">
@@ -76,7 +86,6 @@ const Dashboard = () => {
         </TabsList>
         
         <TabsContent value="overview" className="space-y-6">
-          {/* Welcome card */}
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Bienvenue, {preferences.name} !</CardTitle>
@@ -126,7 +135,6 @@ const Dashboard = () => {
             </CardContent>
           </Card>
           
-          {/* Selected activities preview */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-semibold">Vos activités sélectionnées</h2>
@@ -173,7 +181,6 @@ const Dashboard = () => {
             )}
           </div>
           
-          {/* Recommended activities */}
           {recommendedActivities.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-xl font-semibold">Recommandations pour vous</h2>
