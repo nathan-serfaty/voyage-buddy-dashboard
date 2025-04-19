@@ -21,6 +21,20 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if the URL contains a hash fragment for Supabase auth
+  // and remove it if found
+  useState(() => {
+    // Handle auth redirect
+    const handleAuthRedirect = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data?.session) {
+        navigate("/");
+      }
+    };
+    
+    handleAuthRedirect();
+  });
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -55,11 +69,14 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: window.location.origin
+          }
         });
         if (error) throw error;
         toast({
           title: "Inscription réussie",
-          description: "Vous pouvez maintenant vous connecter",
+          description: "Veuillez vérifier votre email pour confirmer votre compte",
         });
         setIsLogin(true);
       }
