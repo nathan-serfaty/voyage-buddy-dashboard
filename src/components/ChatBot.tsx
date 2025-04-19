@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -269,10 +270,10 @@ const ChatBot = () => {
 
   const handleActivitySelect = (activityId: string) => {
     setSelectedActivities((prev) => {
-      if (prev.includes(activityId)) {
-        return prev.filter(id => id !== activityId);
-      }
-      const newSelected = [...prev, activityId];
+      const isRemoving = prev.includes(activityId);
+      const newSelected = isRemoving
+        ? prev.filter(id => id !== activityId)
+        : [...prev, activityId];
       
       const activity = activities.find(a => a.id === activityId);
       if (activity) {
@@ -280,7 +281,7 @@ const ChatBot = () => {
           ...prev,
           {
             id: Date.now().toString(),
-            text: `${activity.title} a été ${prev.includes(activityId) ? 'retirée de' : 'ajoutée à'} vos activités sélectionnées !`,
+            text: `${activity.title} a été ${isRemoving ? 'retirée de' : 'ajoutée à'} vos activités sélectionnées !`,
             sender: "bot"
           }
         ]);
