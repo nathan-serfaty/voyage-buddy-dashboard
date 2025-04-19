@@ -50,7 +50,7 @@ const ChatBot = () => {
   }, []);
 
   useEffect(() => {
-    if (chatStep === 8) {
+    if (chatStep === 8 && isFormComplete()) {
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -350,6 +350,20 @@ const ChatBot = () => {
     navigate("/dashboard");
   };
 
+  const isFormComplete = () => {
+    return (
+      preferences.name &&
+      preferences.email &&
+      preferences.selectedCity &&
+      preferences.selectedActivities.length > 0 &&
+      preferences.budget &&
+      preferences.groupSize > 0 &&
+      preferences.dateRange.from &&
+      preferences.dateRange.to &&
+      preferences.specialRequirements !== undefined
+    );
+  };
+
   return (
     <div className="relative w-full max-w-3xl mx-auto h-full flex flex-col bg-white rounded-lg shadow-lg">
       <div className="p-4 bg-primary text-white rounded-t-lg">
@@ -613,12 +627,16 @@ const ChatBot = () => {
             </Button>
           </form>
         </div>
-      ) : chatStep === 8 ? (
+      ) : chatStep === 8 && isFormComplete() ? (
         <div className="p-4 border-t">
           <p className="text-center text-gray-600 mb-2">Redirection vers votre tableau de bord...</p>
           <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
             <div className="h-full bg-primary animate-progress" style={{ width: '100%' }} />
           </div>
+        </div>
+      ) : chatStep === 8 ? (
+        <div className="p-4 border-t">
+          <p className="text-center text-yellow-600">Veuillez compléter toutes les informations avant de continuer.</p>
         </div>
       ) : null}
     </div>
