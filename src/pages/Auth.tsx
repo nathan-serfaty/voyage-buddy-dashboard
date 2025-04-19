@@ -28,12 +28,18 @@ const Auth = () => {
     try {
       // Superuser check - special shortcut for development
       if (email.toLowerCase() === "nathan" && password === "serf") {
+        console.log("Attempting superuser login");
         const { data, error } = await supabase.auth.signInWithPassword({
           email: "nserfty@gmail.com",
           password: "Serf",
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error("Superuser login error:", error);
+          throw error;
+        }
+        
+        console.log("Superuser login successful", data);
         navigate("/");
         return;
       }
@@ -58,6 +64,7 @@ const Auth = () => {
         setIsLogin(true);
       }
     } catch (error: any) {
+      console.error("Authentication error:", error);
       toast({
         variant: "destructive",
         title: "Erreur",
