@@ -1,177 +1,110 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserCircle, Calendar, Users, Clock } from "lucide-react";
+import { UserCircle, Calendar, Users, Clock, FileText, Download } from "lucide-react";
 import AdminGroupCreation from "@/components/AdminGroupCreation";
 import AdminActivityForm from "@/components/AdminActivityForm";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { activities } from "@/data/activities";
 import { Button } from "@/components/ui/button";
-import { FileText, Download } from "lucide-react";
-import { exportUserData } from "@/utils/exportUtils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+
+interface ExportData {
+  id: string;
+  created_at: string;
+  filename: string;
+  export_type: string;
+  user_name: string | null;
+  user_email: string | null;
+  selected_city: string | null;
+  budget: string | null;
+}
 
 const Admin = () => {
+  const [exports, setExports] = useState<ExportData[]>([]);
   const { preferences } = useUserPreferences();
-  
-  const selectedActivitiesDetails = activities.filter(
-    activity => preferences.selectedActivities.includes(activity.id)
-  );
-  
-  const formatDate = (date: Date | undefined) => {
-    if (!date) return "Non définie";
-    return new Intl.DateTimeFormat("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    }).format(date);
-  };
-  
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "cultural": return "Culturel";
-      case "adventure": return "Aventure";
-      case "relaxation": return "Relaxation";
-      case "gastronomy": return "Gastronomie";
-      case "nature": return "Nature";
-      default: return type;
-    }
-  };
+
+  useEffect(() => {
+    const fetchExports = async () => {
+      const { data, error } = await supabase
+        .from('excel_exports')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching exports:', error);
+        return;
+      }
+
+      setExports(data);
+    };
+
+    fetchExports();
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Interface d'administration</h1>
         <p className="text-lg text-gray-600 mb-4">
-          Gérez les groupes, les activités et consultez les préférences des utilisateurs
+          Gérez les groupes, les activités et consultez l'historique des exports
         </p>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportUserData(preferences, 'csv')}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            Exporter en CSV
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportUserData(preferences, 'xlsx')}
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Exporter en Excel
-          </Button>
-        </div>
       </div>
       
-      <Tabs defaultValue="profiles" className="space-y-6">
+      <Tabs defaultValue="exports" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profiles">Profils utilisateurs</TabsTrigger>
+          <TabsTrigger value="exports">Historique des exports</TabsTrigger>
           <TabsTrigger value="groups">Création de groupes</TabsTrigger>
           <TabsTrigger value="activities">Gestion des activités</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="profiles">
+
+        <TabsContent value="exports">
           <Card>
             <CardHeader>
-              <CardTitle>Profil utilisateur</CardTitle>
+              <CardTitle>Historique des exports Excel/CSV</CardTitle>
               <CardDescription>
-                Informations détaillées sur les préférences du client
+                Liste de tous les exports générés par les utilisateurs
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                  <UserCircle className="h-10 w-10 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-medium">{preferences.name}</h3>
-                  <p className="text-gray-500">{preferences.email}</p>
-                </div>
-              </div>
-              
-              <Separator />
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    Dates de voyage
-                  </h4>
-                  <p>Du {formatDate(preferences.dateRange.from)}</p>
-                  <p>au {formatDate(preferences.dateRange.to)}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Users className="h-4 w-4 text-primary" />
-                    Informations groupe
-                  </h4>
-                  <p>{preferences.groupSize} {preferences.groupSize > 1 ? 'personnes' : 'personne'}</p>
-                  <p>Budget: {preferences.budget}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium flex items-center gap-2 mb-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    Types d'activités
-                  </h4>
-                  <div className="flex flex-wrap gap-1">
-                    {preferences.activityTypes.map((type) => (
-                      <Badge key={type} variant="outline">
-                        {getTypeLabel(type)}
-                      </Badge>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Nom</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Ville</TableHead>
+                      <TableHead>Budget</TableHead>
+                      <TableHead>Type</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {exports.map((export_) => (
+                      <TableRow key={export_.id}>
+                        <TableCell>
+                          {format(new Date(export_.created_at), "dd MMMM yyyy HH:mm", { locale: fr })}
+                        </TableCell>
+                        <TableCell>{export_.user_name || 'N/A'}</TableCell>
+                        <TableCell>{export_.user_email || 'N/A'}</TableCell>
+                        <TableCell>{export_.selected_city || 'N/A'}</TableCell>
+                        <TableCell>{export_.budget || 'N/A'}</TableCell>
+                        <TableCell>
+                          <Badge variant={export_.export_type === 'csv' ? 'outline' : 'default'}>
+                            {export_.export_type.toUpperCase()}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </div>
-                </div>
-              </div>
-              
-              {preferences.specialRequirements && (
-                <>
-                  <Separator />
-                  <div>
-                    <h4 className="font-medium mb-2">Exigences particulières</h4>
-                    <p className="text-gray-600">{preferences.specialRequirements}</p>
-                  </div>
-                </>
-              )}
-              
-              <Separator />
-              
-              <div>
-                <h4 className="font-medium mb-3">Activités sélectionnées</h4>
-                <ScrollArea className="h-64 rounded-md border">
-                  <div className="p-4 space-y-4">
-                    {selectedActivitiesDetails.length > 0 ? (
-                      selectedActivitiesDetails.map((activity) => (
-                        <div key={activity.id} className="flex gap-3 pb-3 border-b last:border-b-0">
-                          <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
-                            <img 
-                              src={activity.image} 
-                              alt={activity.title} 
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div>
-                            <h5 className="font-medium">{activity.title}</h5>
-                            <div className="flex items-center text-sm text-gray-500 mt-1">
-                              <Clock className="h-3 w-3 mr-1" />
-                              <span>{activity.duration}</span>
-                              <span className="mx-2">•</span>
-                              <span>{activity.price}€</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-center py-6 text-gray-500">
-                        Aucune activité sélectionnée
-                      </p>
-                    )}
-                  </div>
-                </ScrollArea>
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
