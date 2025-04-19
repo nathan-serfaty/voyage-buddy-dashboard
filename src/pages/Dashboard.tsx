@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -13,14 +14,26 @@ import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { exportUserData } from "@/utils/exportUtils";
 
 const Dashboard = () => {
-  const { preferences, chatCompleted } = useUserPreferences();
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const { preferences, chatCompleted } = useUserPreferences();
   
   useEffect(() => {
+    if (!loading && !user) {
+      navigate("/auth");
+    }
     if (!chatCompleted) {
       navigate("/");
     }
-  }, [chatCompleted, navigate]);
+  }, [chatCompleted, navigate, user, loading]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Chargement...</p>
+      </div>
+    );
+  }
 
   const selectedActivitiesDetails: Activity[] = activities.filter(
     activity => preferences.selectedActivities.includes(activity.id)
