@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Search, Filter, X } from "lucide-react";
 import ActivityCard from "@/components/ActivityCard";
-import { activities, Activity } from "@/data/activities";
+import { activities } from "@/data/activities";
+import { Activity } from "@/types/activity";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 
 const Activities = () => {

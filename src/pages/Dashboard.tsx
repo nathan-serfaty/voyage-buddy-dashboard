@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,7 +10,8 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Calendar, MapPin, Users, Clock, CalendarDays, Wallet, User2, Mail, FileText, Download } from "lucide-react";
-import { activities, Activity } from "@/data/activities";
+import { activities } from "@/data/activities";
+import { Activity } from "@/types/activity";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { exportUserData } from "@/utils/exportUtils";
 

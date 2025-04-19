@@ -1,9 +1,10 @@
+
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Users, Clock, MapPin, Star } from "lucide-react";
 import { useState } from "react";
-import { Activity } from "@/data/activities";
+import { Activity } from "@/types/activity";
 import { cn } from "@/lib/utils";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { AspectRatio } from "@/components/ui/aspect-ratio";

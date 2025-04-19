@@ -1,4 +1,7 @@
+
 import { Activity } from "@/types/activity";
+
+export { Activity };
 
 export const activities: Activity[] = [
   {
