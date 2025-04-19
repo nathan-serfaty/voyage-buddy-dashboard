@@ -1,63 +1,16 @@
-
 import { Activity } from "@/types/activity";
 
-// Use 'export type' for re-exporting types when using isolatedModules
 export type { Activity };
 
 export const activities: Activity[] = [
   {
     id: "1",
-    title: "Visite de la médina de Tunis",
-    description: "Découvrez la richesse culturelle et architecturale de la médina de Tunis, patrimoine mondial de l'UNESCO, avec ses souks animés et son artisanat traditionnel. Une plongée authentique dans l'histoire et la culture tunisienne.",
-    location: "Tunis, Tunisie",
-    price: 45,
-    duration: "4 heures",
-    image: "https://images.unsplash.com/photo-1548701762-bba4c032c3ac?auto=format&fit=crop&w=800&q=80",
-    type: ["cultural", "relaxation"],
-    rating: 4.7,
-    groupSize: {
-      min: 2,
-      max: 12
-    }
-  },
-  {
-    id: "2",
-    title: "Excursion en quad dans le désert tunisien",
-    description: "Vivez une aventure palpitante à travers les dunes dorées du Sahara tunisien en quad, avec des vues spectaculaires sur les oasis et les paysages désertiques.",
-    location: "Douz, Tunisie",
-    price: 85,
-    duration: "3 heures",
-    image: "https://images.unsplash.com/photo-1547465375-c082c8f8d97e?auto=format&fit=crop&w=800&q=80",
-    type: ["adventure", "nature"],
-    rating: 4.9,
-    groupSize: {
-      min: 1,
-      max: 8
-    }
-  },
-  {
-    id: "3",
-    title: "Visite des oasis de Chebika et Tamerza",
-    description: "Explorez les magnifiques oasis de montagne de Chebika et Tamerza, avec leurs palmeraies luxuriantes, sources d'eau naturelles et paysages montagneux à couper le souffle.",
-    location: "Tozeur, Tunisie",
-    price: 55,
-    duration: "6 heures",
-    image: "https://images.unsplash.com/photo-1504514917469-dd27c74b4baa?auto=format&fit=crop&w=800&q=80",
-    type: ["nature", "cultural"],
-    rating: 4.6,
-    groupSize: {
-      min: 2,
-      max: 15
-    }
-  },
-  {
-    id: "4",
-    title: "Rallye du Sud Tunisien 2024",
-    description: "Participez au célèbre Rallye du Sud Tunisien, une expérience unique combinant sport et découverte dans les déserts enchanteurs du Sud. Course à pied, visites culturelles et nuit sous les étoiles dans un campement traditionnel.",
+    title: "Great Erg 2024: Au Cœur de l'Aventure Saharienne",
+    description: "Une expérience unique combinant sport et découverte dans les déserts enchanteurs du Sud tunisien. Course à pied, visites culturelles et nuit sous les étoiles dans un campement traditionnel. Du 27 octobre au 3 novembre 2024, un séjour sportif organisé par SGM Aventure et Touil Travel.",
     location: "Désert du Sahara, Tunisie",
     price: 250,
-    duration: "3 jours",
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
+    duration: "8 jours",
+    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800",
     type: ["adventure", "cultural", "sport"],
     rating: 4.9,
     groupSize: {
@@ -66,48 +19,93 @@ export const activities: Activity[] = [
     }
   },
   {
-    id: "5",
-    title: "De Sidi Bou Saïd à Carthage: Circuit Culturel",
-    description: "Un circuit d'une journée à travers les merveilles de Sidi Bou Saïd et Carthage. Découvrez l'architecture bleue et blanche emblématique, explorez les ruines romaines et profitez de la vue imprenable sur la Méditerranée.",
-    location: "Tunis, Tunisie",
-    price: 70,
-    duration: "1 jour",
-    image: "https://images.unsplash.com/photo-1570432024862-70be773766fd?auto=format&fit=crop&w=800&q=80",
-    type: ["cultural", "gastronomy", "nature"],
+    id: "2",
+    title: "Traversée Djerba-Tozeur: Un Voyage Authentique",
+    description: "Une aventure de 4 jours commençant à Djerba avec la fabrication traditionnelle de savon, explorant Ksar Hedada et les villages berbères. L'itinéraire traverse Douz, Chott El Jerid, et se termine dans les villages de montagne autour de Tozeur.",
+    location: "Djerba-Tozeur, Tunisie",
+    price: 180,
+    duration: "4 jours",
+    image: "https://images.unsplash.com/photo-1504514917469-dd27c74b4baa",
+    type: ["cultural", "adventure"],
     rating: 4.8,
     groupSize: {
       min: 2,
-      max: 12
+      max: 15
+    }
+  },
+  {
+    id: "3",
+    title: "Excursions Familiales dans le Sahara Tunisien",
+    description: "Découverte magique du Sahara tunisien en famille, de Djerba aux dunes dorées. Des activités variées pour petits et grands : escalade de dunes, balades à dos de chameau et excursions en 4x4.",
+    location: "Sahara Tunisien",
+    price: 150,
+    duration: "3-7 jours",
+    image: "https://images.unsplash.com/photo-1682686581312-506a8b53190e",
+    type: ["family", "adventure", "cultural"],
+    rating: 4.7,
+    groupSize: {
+      min: 3,
+      max: 8
+    }
+  },
+  {
+    id: "4",
+    title: "Voyage Incentive",
+    description: "Une expérience unique de team-building dans le cadre majestueux du désert tunisien. Des activités personnalisées, de la balade à dos de dromadaire aux soirées sous les étoiles, pour renforcer la cohésion d'équipe.",
+    location: "Tunisie du Sud",
+    price: 200,
+    duration: "2-5 jours",
+    image: "https://images.unsplash.com/photo-1570432024862-70be773766fd",
+    type: ["teambuilding", "adventure"],
+    rating: 4.9,
+    groupSize: {
+      min: 8,
+      max: 50
+    }
+  },
+  {
+    id: "5",
+    title: "Excursion Sur Mesure",
+    description: "Créons ensemble votre expérience parfaite dans le désert tunisien. Un voyage entièrement personnalisé selon vos envies, votre rythme et vos centres d'intérêt.",
+    location: "Tunisie",
+    price: 300,
+    duration: "Sur mesure",
+    image: "https://images.unsplash.com/photo-1507272931001-fc06c17e4f43",
+    type: ["custom", "luxury"],
+    rating: 5.0,
+    groupSize: {
+      min: 1,
+      max: 20
     }
   },
   {
     id: "6",
-    title: "Golf dans l'oasis de Tozeur",
-    description: "Une expérience unique de golf dans le cadre majestueux de l'oasis de Tozeur. Parcours conçus dans le respect de l'environnement, offrant une parfaite harmonie entre sport et nature au cœur du désert tunisien.",
-    location: "Tozeur, Tunisie",
+    title: "Sortie Entre Amis",
+    description: "Une aventure mémorable entre amis dans le désert tunisien. Randonnées, découvertes culturelles et soirées sous les étoiles pour renforcer vos liens d'amitié.",
+    location: "Désert Tunisien",
     price: 120,
-    duration: "4 heures",
-    image: "https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?auto=format&fit=crop&w=800&q=80",
-    type: ["sport", "relaxation", "nature"],
-    rating: 4.6,
+    duration: "2-4 jours",
+    image: "https://images.unsplash.com/photo-1547465375-c082c8f8d97e",
+    type: ["friends", "adventure", "cultural"],
+    rating: 4.8,
     groupSize: {
-      min: 1,
-      max: 4
+      min: 4,
+      max: 12
     }
   },
   {
     id: "7",
-    title: "Team Building dans le désert de Douz",
-    description: "Une expérience de team building unique dans le cadre majestueux du désert tunisien à Douz. Activités personnalisées, de la balade à dos de dromadaire aux soirées sous les étoiles dans un campement berbère.",
-    location: "Douz, Tunisie",
-    price: 180,
-    duration: "2 jours",
-    image: "https://images.unsplash.com/photo-1682686581312-506a8b53190e?auto=format&fit=crop&w=800&q=80",
-    type: ["adventure", "cultural", "teambuilding"],
+    title: "Excursion en Couple",
+    description: "Un séjour romantique dans le cadre enchanteur du Sahara. Des moments privilégiés à deux, entre couchers de soleil sur les dunes et nuits étoilées.",
+    location: "Sahara Tunisien",
+    price: 280,
+    duration: "2-3 jours",
+    image: "https://images.unsplash.com/photo-1548701762-bba4c032c3ac",
+    type: ["romantic", "luxury", "adventure"],
     rating: 4.9,
     groupSize: {
-      min: 8,
-      max: 25
+      min: 2,
+      max: 2
     }
   }
 ];

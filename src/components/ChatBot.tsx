@@ -1,8 +1,7 @@
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -22,7 +21,7 @@ type Message = {
   id: string;
   text: string;
   sender: "bot" | "user";
-  inputType?: "text" | "date" | "activities" | "groupSize" | "budget" | "special" | "city";
+  inputType?: "cities" | "date" | "activities" | "groupSize" | "budget" | "special" | "email";
 };
 
 const ChatBot = () => {
@@ -30,6 +29,7 @@ const ChatBot = () => {
   const [inputValue, setInputValue] = useState("");
   const [chatStep, setChatStep] = useState(0);
   const [dateRange, setDateRange] = useState<DateRange>({ from: undefined, to: undefined });
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [groupSize, setGroupSize] = useState<number>(1);
   const [budget, setBudget] = useState<string>("");
@@ -43,16 +43,16 @@ const ChatBot = () => {
       setMessages([
         {
           id: "1",
-          text: "Bienvenue chez SGM Tours ! Je suis là pour vous aider à planifier votre expérience parfaite en Tunisie. Quelle région souhaitez-vous explorer ? (Tunis, Hammamet, Sousse, Monastir, etc.)",
+          text: "Bienvenue chez SGM Tours ! Je suis là pour vous aider à planifier votre expérience parfaite en Tunisie. Quelles régions souhaitez-vous explorer ? (Vous pouvez en sélectionner plusieurs)",
           sender: "bot",
-          inputType: "city"
+          inputType: "cities"
         }
       ]);
     }, 500);
   }, []);
 
   useEffect(() => {
-    if (chatStep === 8 && isFormComplete()) {
+    if (chatStep === 7) {
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -78,6 +78,19 @@ const ChatBot = () => {
     processUserResponse(newUserMessage);
   };
 
+  const isFormComplete = () => {
+    return (
+      preferences.selectedCity &&
+      preferences.selectedActivities.length > 0 &&
+      preferences.budget &&
+      preferences.groupSize > 0 &&
+      preferences.dateRange.from &&
+      preferences.dateRange.to &&
+      preferences.specialRequirements !== undefined &&
+      preferences.email !== undefined
+    );
+  };
+
   const simulateBotTyping = (callback: () => void) => {
     setIsTyping(true);
     setTimeout(() => {
@@ -86,84 +99,40 @@ const ChatBot = () => {
     }, 1000);
   };
 
-  const isFormComplete = () => {
-    return (
-      preferences.name &&
-      preferences.email &&
-      preferences.selectedCity &&
-      preferences.selectedActivities.length > 0 &&
-      preferences.budget &&
-      preferences.groupSize > 0 &&
-      preferences.dateRange.from &&
-      preferences.dateRange.to &&
-      preferences.specialRequirements !== undefined
-    );
-  };
-
   const processUserResponse = (message: Message) => {
     switch (chatStep) {
-      case 0:
+      case 0: // Cities
         simulateBotTyping(() => {
-          updatePreferences({ selectedCity: message.text });
+          updatePreferences({ selectedCity: selectedCities.join(",") });
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Excellent choix ! Pour personnaliser votre expérience, pourriez-vous me dire votre nom ?",
-              sender: "bot"
+              text: "Excellent ! Quand souhaitez-vous voyager ? Sélectionnez vos dates préférées :",
+              sender: "bot",
+              inputType: "date"
             }
           ]);
           setChatStep(1);
         });
         break;
       
-      case 1:
+      case 1: // Dates
         simulateBotTyping(() => {
-          updatePreferences({ name: message.text });
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: `Ravi de vous rencontrer, ${message.text} ! Veuillez nous fournir votre email afin que nous puissions vous envoyer les informations détaillées de votre circuit personnalisé.`,
-              sender: "bot"
+              text: "Quel type d'expérience recherchez-vous ?",
+              sender: "bot",
+              inputType: "activities"
             }
           ]);
           setChatStep(2);
         });
         break;
-      
-      case 2:
-        simulateBotTyping(() => {
-          updatePreferences({ email: message.text });
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              text: "Quand souhaitez-vous visiter la Tunisie ? Vous pouvez sélectionner vos dates préférées :",
-              sender: "bot",
-              inputType: "date"
-            }
-          ]);
-          setChatStep(3);
-        });
-        break;
-      
-      case 3:
-        simulateBotTyping(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              text: "Excellent ! Qu'est-ce qui vous intéresse le plus en Tunisie ? Sélectionnez les expériences qui vous attirent :",
-              sender: "bot",
-              inputType: "activities"
-            }
-          ]);
-          setChatStep(4);
-        });
-        break;
-      
-      case 4:
+
+      case 2: // Activities
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -174,74 +143,111 @@ const ChatBot = () => {
               inputType: "groupSize"
             }
           ]);
-          setChatStep(5);
+          setChatStep(3);
         });
         break;
-      
-      case 5:
+
+      case 3: // Group size
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Quel est votre budget par personne pour les activités et expériences ? Cela nous aide à suggérer les options les plus appropriées :",
+              text: "Quel est votre budget par personne pour cette expérience ?",
               sender: "bot",
               inputType: "budget"
+            }
+          ]);
+          setChatStep(4);
+        });
+        break;
+
+      case 4: // Budget
+        simulateBotTyping(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Avez-vous des exigences ou préférences particulières ? (ex: restrictions alimentaires, besoins d'accessibilité)",
+              sender: "bot",
+              inputType: "special"
+            }
+          ]);
+          setChatStep(5);
+        });
+        break;
+
+      case 5: // Special requirements
+        simulateBotTyping(() => {
+          updatePreferences({ specialRequirements: message.text });
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Pour finaliser votre demande, pourriez-vous me donner votre email afin que nous puissions vous envoyer les détails de votre circuit personnalisé ?",
+              sender: "bot",
+              inputType: "email"
             }
           ]);
           setChatStep(6);
         });
         break;
-      
-      case 6:
+
+      case 6: // Email
         simulateBotTyping(() => {
+          updatePreferences({ email: message.text });
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Avez-vous des exigences ou préférences particulières ? (ex: restrictions alimentaires, besoins d'accessibilité, intérêts spécifiques pour la culture/histoire)",
-              sender: "bot",
-              inputType: "special"
+              text: "Merci ! J'ai recueilli toutes les informations nécessaires pour créer votre expérience tunisienne personnalisée. Vous allez être redirigé vers votre tableau de bord où vous pourrez consulter nos suggestions adaptées à votre voyage.",
+              sender: "bot"
             }
           ]);
           setChatStep(7);
+          setChatCompleted(true);
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 2000);
         });
         break;
-      
-      case 7:
-        simulateBotTyping(() => {
-          updatePreferences({ specialRequirements: message.text });
-          if (isFormComplete()) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: Date.now().toString(),
-                text: "Merci d'avoir partagé vos préférences ! J'ai recueilli toutes les informations nécessaires pour créer votre expérience tunisienne personnalisée. Vous allez être redirigé vers votre tableau de bord où vous pourrez consulter nos suggestions adaptées à votre voyage.",
-                sender: "bot"
-              }
-            ]);
-            setChatStep(8);
-            setChatCompleted(true);
-            setTimeout(() => {
-              navigate("/dashboard");
-            }, 2000);
-          } else {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: Date.now().toString(),
-                text: "Il semble qu'il nous manque certaines informations. Pourriez-vous recommencer pour nous assurer de créer l'itinéraire parfait pour vous ?",
-                sender: "bot"
-              }
-            ]);
-            setChatStep(0);
-          }
-        });
-        break;
-      
+
       default:
         break;
     }
+  };
+
+  const handleCitySelect = (cityId: string) => {
+    setSelectedCities((prev) => {
+      const newSelected = prev.includes(cityId)
+        ? prev.filter(id => id !== cityId)
+        : [...prev, cityId];
+      return newSelected;
+    });
+  };
+
+  const handleCitiesSubmit = () => {
+    if (selectedCities.length === 0) return;
+
+    const citiesText = selectedCities
+      .map(cityId => cities.find(c => c.id === cityId)?.name)
+      .filter(Boolean)
+      .join(", ");
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        text: `J'aimerais visiter : ${citiesText}`,
+        sender: "user"
+      }
+    ]);
+
+    processUserResponse({
+      id: Date.now().toString(),
+      text: citiesText,
+      sender: "user"
+    });
   };
 
   const handleDateSelect = (range: DateRange) => {
@@ -402,8 +408,233 @@ const ChatBot = () => {
     });
   };
 
-  const handleGoToDashboard = () => {
-    navigate("/dashboard");
+  const handleEmailSubmit = (text: string) => {
+    updatePreferences({ email: text });
+    
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        text: text,
+        sender: "user"
+      }
+    ]);
+    
+    processUserResponse({
+      id: Date.now().toString(),
+      text: text,
+      sender: "user"
+    });
+  };
+
+  const renderInput = (inputType: string) => {
+    switch (inputType) {
+      case "cities":
+        return (
+          <div className="mt-3 space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              {cities.map((city) => (
+                <div key={city.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={city.id}
+                    checked={selectedCities.includes(city.id)}
+                    onCheckedChange={() => handleCitySelect(city.id)}
+                  />
+                  <Label htmlFor={city.id}>{city.name}</Label>
+                </div>
+              ))}
+            </div>
+            <Button 
+              onClick={handleCitiesSubmit}
+              disabled={selectedCities.length === 0}
+            >
+              Valider
+            </Button>
+          </div>
+        );
+
+      case "date":
+        return (
+          <div className="mt-3">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dateRange.from && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "dd/MM/yyyy")} - {format(dateRange.to, "dd/MM/yyyy")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "dd/MM/yyyy")
+                    )
+                  ) : (
+                    <span>Sélectionnez les dates</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={new Date()}
+                  selected={dateRange}
+                  onSelect={handleDateSelect}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+        );
+
+      case "activities":
+        return (
+          <div className="mt-3">
+            <div className="grid grid-cols-2 gap-2">
+              {activities.map((activity) => (
+                <div key={activity.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={activity.id}
+                    checked={selectedActivities.includes(activity.id)}
+                    onCheckedChange={() => {
+                      if (onActivitySelect) {
+                        handleActivitySelect(activity.id);
+                      }
+                    }}
+                  />
+                  <Label htmlFor={activity.id}>{activity.title}</Label>
+                </div>
+              ))}
+            </div>
+            <Button 
+              onClick={handleActivitiesSubmit}
+              disabled={selectedActivities.length === 0}
+              className="mt-4"
+            >
+              Valider
+            </Button>
+          </div>
+        );
+
+      case "groupSize":
+        return (
+          <div className="mt-3 space-y-3">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setGroupSize(prev => Math.max(1, prev - 1))}
+              >
+                -
+              </Button>
+              <span className="text-xl font-medium">{groupSize}</span>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setGroupSize(prev => prev + 1)}
+              >
+                +
+              </Button>
+            </div>
+            <Button onClick={handleGroupSizeSubmit}>
+              Valider
+            </Button>
+          </div>
+        );
+
+      case "budget":
+        return (
+          <div className="mt-3 space-y-3">
+            <RadioGroup defaultValue="medium" onValueChange={setBudget}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Moins de 50€" id="budget-low" />
+                <Label htmlFor="budget-low">Moins de 50€ par personne</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="50€ - 100€" id="budget-medium" />
+                <Label htmlFor="budget-medium">50€ - 100€ par personne</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Plus de 100€" id="budget-high" />
+                <Label htmlFor="budget-high">Plus de 100€ par personne</Label>
+              </div>
+            </RadioGroup>
+            <Button onClick={handleBudgetSubmit} disabled={!budget}>
+              Valider
+            </Button>
+          </div>
+        );
+
+      case "special":
+        return (
+          <div className="mt-3 space-y-3">
+            <Textarea 
+              placeholder="Exigences alimentaires, accessibilité, etc."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <div className="flex justify-between">
+              <Button 
+                variant="outline"
+                onClick={() => handleSpecialSubmit("Pas d'exigences particulières")}
+              >
+                Passer
+              </Button>
+              <Button onClick={() => handleSpecialSubmit(inputValue)}>
+                Valider
+              </Button>
+            </div>
+          </div>
+        );
+
+      case "email":
+        return (
+          <div className="mt-3 space-y-3">
+            <Input
+              placeholder="Votre email..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            <Button onClick={() => handleEmailSubmit(inputValue)}>
+              Valider
+            </Button>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const onActivitySelect = (activityId: string) => {
+    setSelectedActivities((prev) => {
+      const isRemoving = prev.includes(activityId);
+      const newSelected = isRemoving
+        ? prev.filter(id => id !== activityId)
+        : [...prev, activityId];
+      
+      const activity = activities.find(a => a.id === activityId);
+      if (activity) {
+        const activityTypes: ActivityType[] = activity.type
+          .filter(type => 
+            ["cultural", "adventure", "relaxation", "gastronomy", "nature"].includes(type)
+          ) as ActivityType[];
+        
+        updatePreferences({ 
+          selectedActivities: newSelected,
+          activityTypes: activityTypes
+        });
+      }
+      
+      return newSelected;
+    });
   };
 
   return (
@@ -440,189 +671,7 @@ const ChatBot = () => {
                 </div>
                 <div>
                   {message.text}
-                  
-                  {message.inputType === "city" && (
-                    <div className="mt-3">
-                      <div className="grid grid-cols-2 gap-2">
-                        {cities.map((city) => (
-                          <Button
-                            key={city.id}
-                            variant="outline"
-                            onClick={() => {
-                              setMessages((prev) => [
-                                ...prev,
-                                {
-                                  id: Date.now().toString(),
-                                  text: city.name,
-                                  sender: "user"
-                                }
-                              ]);
-                              processUserResponse({
-                                id: Date.now().toString(),
-                                text: city.id,
-                                sender: "user"
-                              });
-                            }}
-                            className="flex flex-col items-start p-4"
-                          >
-                            <span className="font-bold">{city.name}</span>
-                            <span className="text-sm text-gray-500">{city.description}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {message.inputType === "date" && (
-                    <div className="mt-3">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !dateRange.from && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange.from ? (
-                              dateRange.to ? (
-                                <>
-                                  {format(dateRange.from, "dd/MM/yyyy")} - {format(dateRange.to, "dd/MM/yyyy")}
-                                </>
-                              ) : (
-                                format(dateRange.from, "dd/MM/yyyy")
-                              )
-                            ) : (
-                              <span>Sélectionnez les dates</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            initialFocus
-                            mode="range"
-                            defaultMonth={new Date()}
-                            selected={dateRange}
-                            onSelect={handleDateSelect}
-                            numberOfMonths={2}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  )}
-                  
-                  {message.inputType === "activities" && (
-                    <div className="mt-3">
-                      <div className="w-full h-[400px] rounded-lg overflow-hidden mb-4">
-                        <Map 
-                          selectedCity={preferences.selectedCity}
-                          onActivitySelect={handleActivitySelect}
-                          className="w-full h-full"
-                        />
-                      </div>
-                      {selectedActivities.length > 0 && (
-                        <div className="mt-4">
-                          <h3 className="font-semibold mb-2">Activités sélectionnées:</h3>
-                          <div className="grid grid-cols-2 gap-2">
-                            {selectedActivities.map((activityId) => {
-                              const activity = activities.find(a => a.id === activityId);
-                              if (!activity) return null;
-                              return (
-                                <div key={activity.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                                  <img 
-                                    src={activity.image} 
-                                    alt={activity.title} 
-                                    className="w-12 h-12 rounded object-cover"
-                                  />
-                                  <div>
-                                    <p className="font-medium text-sm">{activity.title}</p>
-                                    <p className="text-xs text-gray-500">{activity.price}€</p>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                      <Button 
-                        onClick={handleActivitiesSubmit}
-                        disabled={selectedActivities.length === 0}
-                        className="mt-4"
-                      >
-                        Valider
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {message.inputType === "groupSize" && (
-                    <div className="mt-3 space-y-3">
-                      <div className="flex items-center space-x-4">
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          onClick={() => setGroupSize(prev => Math.max(1, prev - 1))}
-                        >
-                          -
-                        </Button>
-                        <span className="text-xl font-medium">{groupSize}</span>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          onClick={() => setGroupSize(prev => prev + 1)}
-                        >
-                          +
-                        </Button>
-                      </div>
-                      <Button onClick={handleGroupSizeSubmit}>
-                        Valider
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {message.inputType === "budget" && (
-                    <div className="mt-3 space-y-3">
-                      <RadioGroup defaultValue="medium" onValueChange={setBudget}>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Moins de 50€" id="budget-low" />
-                          <Label htmlFor="budget-low">Moins de 50€ par personne</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="50€ - 100€" id="budget-medium" />
-                          <Label htmlFor="budget-medium">50€ - 100€ par personne</Label>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="Plus de 100€" id="budget-high" />
-                          <Label htmlFor="budget-high">Plus de 100€ par personne</Label>
-                        </div>
-                      </RadioGroup>
-                      <Button onClick={handleBudgetSubmit} disabled={!budget}>
-                        Valider
-                      </Button>
-                    </div>
-                  )}
-                  
-                  {message.inputType === "special" && (
-                    <div className="mt-3 space-y-3">
-                      <Textarea 
-                        placeholder="Exigences alimentaires, accessibilité, etc."
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        className="min-h-[100px]"
-                      />
-                      <div className="flex justify-between">
-                        <Button 
-                          variant="outline"
-                          onClick={() => handleSpecialSubmit("Pas d'exigences particulières")}
-                        >
-                          Passer
-                        </Button>
-                        <Button onClick={() => handleSpecialSubmit(inputValue)}>
-                          Valider
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+                  {renderInput(message.inputType || "")}
                 </div>
               </div>
             </div>
@@ -649,7 +698,7 @@ const ChatBot = () => {
         <div ref={messagesEndRef} />
       </div>
       
-      {chatStep === 1 || chatStep === 2 ? (
+      {chatStep === 6 ? (
         <div className="p-4 border-t">
           <form
             onSubmit={(e) => {
@@ -661,7 +710,7 @@ const ChatBot = () => {
             <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={chatStep === 1 ? "Votre nom..." : "Votre email..."}
+              placeholder={"Votre email..."}
               className="flex-1"
             />
             <Button type="submit" size="icon">
@@ -669,14 +718,14 @@ const ChatBot = () => {
             </Button>
           </form>
         </div>
-      ) : chatStep === 8 && isFormComplete() ? (
+      ) : chatStep === 7 && isFormComplete() ? (
         <div className="p-4 border-t">
           <p className="text-center text-gray-600 mb-2">Redirection vers votre tableau de bord...</p>
           <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
             <div className="h-full bg-primary animate-progress" style={{ width: '100%' }} />
           </div>
         </div>
-      ) : chatStep === 8 ? (
+      ) : chatStep === 7 ? (
         <div className="p-4 border-t">
           <p className="text-center text-yellow-600">Veuillez compléter toutes les informations avant de continuer.</p>
         </div>
