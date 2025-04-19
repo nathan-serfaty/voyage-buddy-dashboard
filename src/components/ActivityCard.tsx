@@ -7,6 +7,7 @@ import { Activity } from "@/data/activities";
 import { cn } from "@/lib/utils";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -14,6 +15,7 @@ interface ActivityCardProps {
 
 const ActivityCard = ({ activity }: ActivityCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { preferences, updatePreferences } = useUserPreferences();
 
   const getTypeLabel = (type: string) => {
@@ -56,16 +58,39 @@ const ActivityCard = ({ activity }: ActivityCardProps) => {
     }
   };
 
+  const getPlaceholderImage = () => {
+    const placeholders = [
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475",
+      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+      "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158",
+      "https://images.unsplash.com/photo-1531297484001-80022131f5a1"
+    ];
+    
+    const index = parseInt(activity.id.replace(/[^0-9]/g, ''), 10) % placeholders.length;
+    return placeholders[index];
+  };
+
   return (
     <Card className="overflow-hidden destination-card h-full flex flex-col">
       <div className="relative">
         <AspectRatio ratio={16 / 9}>
-          <img
-            src={activity.image}
-            alt={activity.title}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-            loading="lazy"
-          />
+          {imageError ? (
+            <img
+              src={getPlaceholderImage()}
+              alt={activity.title}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <img
+              src={activity.image || getPlaceholderImage()}
+              alt={activity.title}
+              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              loading="lazy"
+              onError={() => setImageError(true)}
+            />
+          )}
         </AspectRatio>
         <Button
           variant="ghost"
