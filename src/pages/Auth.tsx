@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,10 +20,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check if the URL contains a hash fragment for Supabase auth
-  // and remove it if found
   useEffect(() => {
-    // Handle auth redirect
     const handleAuthRedirect = async () => {
       const { data, error } = await supabase.auth.getSession();
       if (data?.session) {
@@ -40,24 +36,23 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      // Superuser check - special shortcut for development
+      // Special admin login
       if (email.toLowerCase() === "nserf" && password === "serf") {
-        console.log("Attempting superuser login");
         const { data, error } = await supabase.auth.signInWithPassword({
           email: "nserfty@gmail.com",
           password: "Serf",
         });
         
         if (error) {
-          console.error("Superuser login error:", error);
+          console.error("Admin login error:", error);
           throw error;
         }
         
-        console.log("Superuser login successful", data);
         navigate("/admin");
         return;
       }
 
+      // Regular login logic remains the same
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,
