@@ -156,39 +156,40 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Quel type d'expérience recherchez-vous ?",
+              text: "Combien de personnes participeront à cette aventure ?",
               sender: "bot",
-              inputType: "activities"
+              inputType: "groupSize"
             }
           ]);
           setChatStep(4);
         });
         break;
 
-      case 4: // Activities
+      case 4: // Group size
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Combien de personnes participeront à cette aventure ?",
+              text: "Quel est votre budget par personne pour cette expérience ? (Veuillez détailler vos attentes)",
               sender: "bot",
-              inputType: "groupSize"
+              inputType: "budget"
             }
           ]);
           setChatStep(5);
         });
         break;
 
-      case 5: // Group size
+      case 5: // Budget
         simulateBotTyping(() => {
+          updatePreferences({ budget: message.text });
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Quel est votre budget par personne pour cette expérience ?",
+              text: "Avez-vous des exigences particulières ? (régime alimentaire, accessibilité, etc.)",
               sender: "bot",
-              inputType: "budget"
+              inputType: "special"
             }
           ]);
           setChatStep(6);
@@ -197,7 +198,6 @@ const ChatBot = () => {
 
       case 6: // Special requirements
         simulateBotTyping(() => {
-          updatePreferences({ specialRequirements: message.text });
           setMessages((prev) => [
             ...prev,
             {
@@ -587,21 +587,22 @@ const ChatBot = () => {
       case "budget":
         return (
           <div className="mt-3 space-y-3">
-            <RadioGroup defaultValue="medium" onValueChange={setBudget}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Moins de 50€" id="budget-low" />
-                <Label htmlFor="budget-low">Moins de 50€ par personne</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="50€ - 100€" id="budget-medium" />
-                <Label htmlFor="budget-medium">50€ - 100€ par personne</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="Plus de 100€" id="budget-high" />
-                <Label htmlFor="budget-high">Plus de 100€ par personne</Label>
-              </div>
-            </RadioGroup>
-            <Button onClick={handleBudgetSubmit} disabled={!budget}>
+            <Textarea 
+              placeholder="Décrivez votre budget et vos attentes..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <Button onClick={() => {
+              if (inputValue.trim()) {
+                updatePreferences({ budget: inputValue });
+                processUserResponse({
+                  id: Date.now().toString(),
+                  text: inputValue,
+                  sender: "user"
+                });
+              }
+            }}>
               Valider
             </Button>
           </div>
