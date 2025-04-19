@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { useState } from "react";
 import { Activity } from "@/data/activities";
 import { cn } from "@/lib/utils";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -16,7 +16,6 @@ const ActivityCard = ({ activity }: ActivityCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
   const { preferences, updatePreferences } = useUserPreferences();
 
-  // Translate activity type to French
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "cultural": return "Culturel";
@@ -28,7 +27,6 @@ const ActivityCard = ({ activity }: ActivityCardProps) => {
     }
   };
 
-  // Get badge color based on type
   const getTypeBadgeColor = (type: string) => {
     switch (type) {
       case "cultural": return "bg-blue-100 text-blue-800";
@@ -43,18 +41,15 @@ const ActivityCard = ({ activity }: ActivityCardProps) => {
   const toggleFavorite = () => {
     setIsFavorite(!isFavorite);
     
-    // Update selected activities in context
     const currentSelections = [...preferences.selectedActivities];
     
     if (!isFavorite) {
-      // Add to selected activities
       if (!currentSelections.includes(activity.id)) {
         updatePreferences({ 
           selectedActivities: [...currentSelections, activity.id] 
         });
       }
     } else {
-      // Remove from selected activities
       updatePreferences({ 
         selectedActivities: currentSelections.filter(id => id !== activity.id) 
       });
@@ -63,17 +58,20 @@ const ActivityCard = ({ activity }: ActivityCardProps) => {
 
   return (
     <Card className="overflow-hidden destination-card h-full flex flex-col">
-      <div className="relative h-48 overflow-hidden">
-        <img
-          src={activity.image}
-          alt={activity.title}
-          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-        />
+      <div className="relative">
+        <AspectRatio ratio={16 / 9}>
+          <img
+            src={activity.image}
+            alt={activity.title}
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            loading="lazy"
+          />
+        </AspectRatio>
         <Button
           variant="ghost"
           size="icon"
           className={cn(
-            "absolute top-2 right-2 rounded-full bg-white hover:bg-white/90",
+            "absolute top-2 right-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white/90",
             isFavorite ? "text-red-500" : "text-gray-500"
           )}
           onClick={toggleFavorite}
