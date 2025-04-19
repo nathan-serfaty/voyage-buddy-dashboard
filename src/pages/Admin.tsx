@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -6,18 +5,17 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserCircle, Calendar, Users, Clock } from "lucide-react";
 import AdminGroupCreation from "@/components/AdminGroupCreation";
+import AdminActivityForm from "@/components/AdminActivityForm";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { activities } from "@/data/activities";
 
 const Admin = () => {
   const { preferences } = useUserPreferences();
   
-  // Get selected activities details
   const selectedActivitiesDetails = activities.filter(
     activity => preferences.selectedActivities.includes(activity.id)
   );
   
-  // Format date
   const formatDate = (date: Date | undefined) => {
     if (!date) return "Non définie";
     return new Intl.DateTimeFormat("fr-FR", {
@@ -27,7 +25,6 @@ const Admin = () => {
     }).format(date);
   };
   
-  // Translate activity type to French
   const getTypeLabel = (type: string) => {
     switch (type) {
       case "cultural": return "Culturel";
@@ -44,17 +41,18 @@ const Admin = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Interface d'administration</h1>
         <p className="text-lg text-gray-600">
-          Gérez les groupes et consultez les préférences des utilisateurs
+          Gérez les groupes, les activités et consultez les préférences des utilisateurs
         </p>
       </div>
       
       <Tabs defaultValue="profiles" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profiles">Profils utilisateurs</TabsTrigger>
           <TabsTrigger value="groups">Création de groupes</TabsTrigger>
+          <TabsTrigger value="activities">Gestion des activités</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="profiles" className="space-y-6">
+        <TabsContent value="profiles">
           <Card>
             <CardHeader>
               <CardTitle>Profil utilisateur</CardTitle>
@@ -160,6 +158,10 @@ const Admin = () => {
         
         <TabsContent value="groups">
           <AdminGroupCreation />
+        </TabsContent>
+
+        <TabsContent value="activities">
+          <AdminActivityForm />
         </TabsContent>
       </Tabs>
     </div>
