@@ -171,7 +171,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Quel est votre budget par personne pour cette expérience ? (Veuillez détailler vos attentes)",
+              text: "Quel est votre budget par personne pour cette expérience ?",
               sender: "bot",
               inputType: "budget"
             }
@@ -187,32 +187,34 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Avez-vous des exigences particulières ? (régime alimentaire, accessibilité, etc.)",
+              text: "(Veuillez détailler vos attentes concernant le voyage)",
               sender: "bot",
-              inputType: "special"
+              inputType: "additionalComments"
             }
           ]);
           setChatStep(6);
         });
         break;
 
-      case 6: // Special requirements
+      case 6: // Additional Comments
         simulateBotTyping(() => {
+          updatePreferences({ additionalComments: message.text });
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Y a-t-il d'autres choses que vous souhaiteriez nous faire parvenir ?",
+              text: "Avez-vous des exigences particulières ? (régime alimentaire, accessibilité, etc.)",
               sender: "bot",
-              inputType: "additionalComments"
+              inputType: "special"
             }
           ]);
           setChatStep(7);
         });
         break;
 
-      case 7: // Additional comments
+      case 7: // Special requirements
         simulateBotTyping(() => {
+          updatePreferences({ specialRequirements: message.text });
           setMessages((prev) => [
             ...prev,
             {
