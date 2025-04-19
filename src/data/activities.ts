@@ -1,7 +1,8 @@
 
 import { Activity } from "@/types/activity";
 
-export { Activity };
+// Use 'export type' for re-exporting types when using isolatedModules
+export type { Activity };
 
 export const activities: Activity[] = [
   {

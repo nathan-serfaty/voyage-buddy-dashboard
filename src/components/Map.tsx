@@ -1,9 +1,9 @@
-
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { cities } from '@/data/cities';
 import { activities } from '@/data/activities';
+import { Activity } from '@/types/activity';
 
 interface MapProps {
   selectedCity?: string;

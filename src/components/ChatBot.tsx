@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { useUserPreferences, DateRange, ActivityType } from "@/contexts/UserPref
 import { useNavigate } from "react-router-dom";
 import { cities } from "@/data/cities";
 import { activities } from "@/data/activities";
+import { Activity } from "@/types/activity";
 import Map from "@/components/Map";
 
 type Message = {
