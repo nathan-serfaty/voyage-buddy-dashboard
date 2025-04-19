@@ -8,6 +8,9 @@ import AdminGroupCreation from "@/components/AdminGroupCreation";
 import AdminActivityForm from "@/components/AdminActivityForm";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
 import { activities } from "@/data/activities";
+import { Button } from "@/components/ui/button";
+import { FileText, Download } from "lucide-react";
+import { exportUserData } from "@/utils/exportUtils";
 
 const Admin = () => {
   const { preferences } = useUserPreferences();
@@ -40,9 +43,27 @@ const Admin = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Interface d'administration</h1>
-        <p className="text-lg text-gray-600">
+        <p className="text-lg text-gray-600 mb-4">
           Gérez les groupes, les activités et consultez les préférences des utilisateurs
         </p>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportUserData(preferences, 'csv')}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Exporter en CSV
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportUserData(preferences, 'xlsx')}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Exporter en Excel
+          </Button>
+        </div>
       </div>
       
       <Tabs defaultValue="profiles" className="space-y-6">

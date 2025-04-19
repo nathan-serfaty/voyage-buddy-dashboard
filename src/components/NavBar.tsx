@@ -78,17 +78,19 @@ const NavBar = () => {
               })}
             </div>
 
-            {user ? (
-              <Button onClick={handleLogout} variant="outline">
-                Déconnexion
-              </Button>
-            ) : (
+            {!chatCompleted && !user && (
               <Link to="/auth">
                 <Button className="flex items-center">
                   <LogIn className="h-5 w-5 mr-2" />
                   Connexion
                 </Button>
               </Link>
+            )}
+
+            {user && (
+              <Button onClick={handleLogout} variant="outline">
+                Déconnexion
+              </Button>
             )}
           </div>
 

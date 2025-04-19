@@ -41,7 +41,7 @@ const Auth = () => {
 
     try {
       // Superuser check - special shortcut for development
-      if (email.toLowerCase() === "nathan" && password === "serf") {
+      if (email.toLowerCase() === "nserf" && password === "serf") {
         console.log("Attempting superuser login");
         const { data, error } = await supabase.auth.signInWithPassword({
           email: "nserfty@gmail.com",
