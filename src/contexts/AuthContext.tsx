@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('id, first_name, last_name, avatar_url')
         .eq('id', userId)
         .single();
       
@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return null;
       }
       
-      return data;
+      return data as Profile;
     } catch (error) {
       console.error("Error in fetchProfile:", error);
       return null;
@@ -60,7 +60,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (currentSession?.user) {
           const profileData = await fetchProfile(currentSession.user.id);
-          setProfile(profileData);
+          if (profileData) {
+            setProfile(profileData);
+          }
         } else {
           setProfile(null);
         }
@@ -79,7 +81,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (currentSession?.user) {
         const profileData = await fetchProfile(currentSession.user.id);
-        setProfile(profileData);
+        if (profileData) {
+          setProfile(profileData);
+        }
       }
       setLoading(false);
     });

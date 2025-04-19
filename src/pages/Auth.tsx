@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ const Auth = () => {
 
   // Check if the URL contains a hash fragment for Supabase auth
   // and remove it if found
-  useState(() => {
+  useEffect(() => {
     // Handle auth redirect
     const handleAuthRedirect = async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -33,7 +33,7 @@ const Auth = () => {
     };
     
     handleAuthRedirect();
-  });
+  }, [navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();

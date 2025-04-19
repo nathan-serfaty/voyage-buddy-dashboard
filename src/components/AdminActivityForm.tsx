@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type ActivityInsert = Database['public']['Tables']['activities']['Insert'];
 
 interface ActivityFormData {
   title: string;
@@ -29,19 +32,21 @@ export const AdminActivityForm = () => {
   const onSubmit = async (data: ActivityFormData) => {
     setIsSubmitting(true);
     try {
+      const activityData: ActivityInsert = {
+        title: data.title,
+        description: data.description,
+        location: data.location,
+        price: data.price,
+        duration: data.duration,
+        image: data.image,
+        type: data.type,
+        group_size_min: data.groupSizeMin,
+        group_size_max: data.groupSizeMax
+      };
+
       const { error } = await supabase
         .from('activities')
-        .insert({
-          title: data.title,
-          description: data.description,
-          location: data.location,
-          price: data.price,
-          duration: data.duration,
-          image: data.image,
-          type: data.type,
-          group_size_min: data.groupSizeMin,
-          group_size_max: data.groupSizeMax
-        });
+        .insert(activityData);
 
       if (error) throw error;
 
