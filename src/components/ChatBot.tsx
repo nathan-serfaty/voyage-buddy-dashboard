@@ -11,7 +11,7 @@ import { CalendarIcon, Send, User, Bot } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { useUserPreferences, DateRange } from "@/contexts/UserPreferencesContext";
+import { useUserPreferences, DateRange, ActivityType } from "@/contexts/UserPreferencesContext";
 import { useNavigate } from "react-router-dom";
 import { cities } from "@/data/cities";
 import { activities } from "@/data/activities";
@@ -277,6 +277,18 @@ const ChatBot = () => {
       
       const activity = activities.find(a => a.id === activityId);
       if (activity) {
+        // Extract activity types from the selected activities
+        const activityTypes: ActivityType[] = activity.type
+          .filter(type => 
+            ["cultural", "adventure", "relaxation", "gastronomy", "nature"].includes(type)
+          ) as ActivityType[];
+        
+        // Update preferences with both selected activities and activity types
+        updatePreferences({ 
+          selectedActivities: newSelected,
+          activityTypes: activityTypes
+        });
+        
         setMessages((prev) => [
           ...prev,
           {
@@ -294,7 +306,24 @@ const ChatBot = () => {
   const handleActivitiesSubmit = () => {
     if (selectedActivities.length === 0) return;
     
-    updatePreferences({ selectedActivities: selectedActivities });
+    // Collect all activity types from selected activities
+    const allActivityTypes = new Set<ActivityType>();
+    selectedActivities.forEach(activityId => {
+      const activity = activities.find(a => a.id === activityId);
+      if (activity) {
+        activity.type.forEach(type => {
+          if (["cultural", "adventure", "relaxation", "gastronomy", "nature"].includes(type)) {
+            allActivityTypes.add(type as ActivityType);
+          }
+        });
+      }
+    });
+    
+    // Update preferences with both selected activities and all activity types
+    updatePreferences({ 
+      selectedActivities: selectedActivities,
+      activityTypes: Array.from(allActivityTypes)
+    });
     
     const activitiesText = selectedActivities.map(activityId => {
       const activity = activities.find(a => a.id === activityId);
