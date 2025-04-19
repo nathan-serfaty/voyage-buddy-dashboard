@@ -41,7 +41,7 @@ const ChatBot = () => {
       setMessages([
         {
           id: "1",
-          text: "Welcome to SGM Tours! I'm here to help plan your perfect Tunisia experience. Which region would you like to explore? (Tunis, Hammamet, Sousse, Monastir, etc.)",
+          text: "Bienvenue chez SGM Tours ! Je suis là pour vous aider à planifier votre expérience parfaite en Tunisie. Quelle région souhaitez-vous explorer ? (Tunis, Hammamet, Sousse, Monastir, etc.)",
           sender: "bot",
           inputType: "city"
         }
@@ -107,7 +107,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Great choice! To personalize your experience, could you please tell me your name?",
+              text: "Excellent choix ! Pour personnaliser votre expérience, pourriez-vous me dire votre nom ?",
               sender: "bot"
             }
           ]);
@@ -122,7 +122,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: `Nice to meet you, ${message.text}! Please provide your email so we can send you detailed information about your customized tour.`,
+              text: `Ravi de vous rencontrer, ${message.text} ! Veuillez nous fournir votre email afin que nous puissions vous envoyer les informations détaillées de votre circuit personnalisé.`,
               sender: "bot"
             }
           ]);
@@ -137,7 +137,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "When would you like to visit Tunisia? You can select your preferred dates:",
+              text: "Quand souhaitez-vous visiter la Tunisie ? Vous pouvez sélectionner vos dates préférées :",
               sender: "bot",
               inputType: "date"
             }
@@ -152,7 +152,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Excellent! What interests you most about Tunisia? Select the experiences that appeal to you:",
+              text: "Excellent ! Qu'est-ce qui vous intéresse le plus en Tunisie ? Sélectionnez les expériences qui vous attirent :",
               sender: "bot",
               inputType: "activities"
             }
@@ -167,7 +167,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "How many people will be joining this adventure?",
+              text: "Combien de personnes participeront à cette aventure ?",
               sender: "bot",
               inputType: "groupSize"
             }
@@ -182,7 +182,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "What's your budget per person for activities and experiences? This helps us suggest the most suitable options:",
+              text: "Quel est votre budget par personne pour les activités et expériences ? Cela nous aide à suggérer les options les plus appropriées :",
               sender: "bot",
               inputType: "budget"
             }
@@ -197,7 +197,7 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Do you have any special requirements or preferences? (e.g., dietary restrictions, accessibility needs, specific interests in culture/history)",
+              text: "Avez-vous des exigences ou préférences particulières ? (ex: restrictions alimentaires, besoins d'accessibilité, intérêts spécifiques pour la culture/histoire)",
               sender: "bot",
               inputType: "special"
             }
@@ -214,7 +214,7 @@ const ChatBot = () => {
               ...prev,
               {
                 id: Date.now().toString(),
-                text: "Thank you for sharing your preferences! I've gathered all the information needed to create your personalized Tunisian experience. You'll be redirected to your dashboard where you can view our tailored suggestions for your journey.",
+                text: "Merci d'avoir partagé vos préférences ! J'ai recueilli toutes les informations nécessaires pour créer votre expérience tunisienne personnalisée. Vous allez être redirigé vers votre tableau de bord où vous pourrez consulter nos suggestions adaptées à votre voyage.",
                 sender: "bot"
               }
             ]);
@@ -228,7 +228,7 @@ const ChatBot = () => {
               ...prev,
               {
                 id: Date.now().toString(),
-                text: "It seems we're missing some information. Would you mind if we start over to ensure we create the perfect itinerary for you?",
+                text: "Il semble qu'il nous manque certaines informations. Pourriez-vous recommencer pour nous assurer de créer l'itinéraire parfait pour vous ?",
                 sender: "bot"
               }
             ]);
