@@ -1,4 +1,3 @@
-
 import { Activity } from "@/types/activity";
 
 // Use 'export type' for re-exporting types when using isolatedModules
@@ -7,47 +6,47 @@ export type { Activity };
 export const activities: Activity[] = [
   {
     id: "1",
-    title: "Buggy excursion dans le désert",
-    description: "Explorez les merveilles du désert tunisien lors d'une excursion palpitante en buggy. Cette aventure vous plongera au cœur des paysages spectaculaires de cette nature sauvage d'une manière unique et excitante.",
+    title: "Visite de la médina de Djerba",
+    description: "Découvrez la richesse culturelle et architecturale de la médina de Djerba, avec ses souks animés et son artisanat traditionnel. Une plongée authentique dans l'histoire et la culture tunisienne.",
+    location: "Djerba, Tunisie",
+    price: 45,
+    duration: "4 heures",
+    image: "https://images.unsplash.com/photo-1590167409677-4d06d253d273?auto=format&fit=crop&w=800&q=80",
+    type: ["cultural", "relaxation"],
+    rating: 4.7,
+    groupSize: {
+      min: 2,
+      max: 12
+    }
+  },
+  {
+    id: "2",
+    title: "Excursion en quad dans le désert",
+    description: "Vivez une aventure palpitante à travers les dunes dorées du Sahara en quad, avec des vues spectaculaires sur le désert tunisien.",
     location: "Douz, Tunisie",
     price: 85,
-    duration: "4 heures",
-    image: "https://images.unsplash.com/photo-1618523388630-4d4339336234?auto=format&fit=crop&w=800&q=80",
+    duration: "3 heures",
+    image: "https://images.unsplash.com/photo-1622383563227-04401ab4e5ea?auto=format&fit=crop&w=800&q=80",
     type: ["adventure", "nature"],
-    rating: 4.8,
+    rating: 4.9,
     groupSize: {
       min: 1,
       max: 8
     }
   },
   {
-    id: "2",
-    title: "Excursion en Quad dans le Sahara",
-    description: "Découvrez la beauté du désert tunisien lors d'une excursion exaltante en quad ! Nos guides expérimentés vous emmèneront au cœur de ce paysage majestueux, avec du temps pour explorer et admirer les décors spectaculaires.",
-    location: "Douz, Tunisie",
-    price: 95,
-    duration: "3 heures",
-    image: "https://images.unsplash.com/photo-1624809572365-7574d0c51339?auto=format&fit=crop&w=800&q=80",
-    type: ["adventure", "nature"],
-    rating: 4.9,
-    groupSize: {
-      min: 1,
-      max: 6
-    }
-  },
-  {
     id: "3",
-    title: "Aventure à dos de chameau",
-    description: "Une expérience inoubliable vous attend dans le désert tunisien : une aventure à dos de chameau. Immergez-vous dans cette expérience authentique qui vous permettra de découvrir les paysages à couper le souffle et la riche culture de cette région sauvage d'une manière unique et traditionnelle.",
-    location: "Douz, Tunisie",
-    price: 65,
-    duration: "2 heures",
-    image: "https://images.unsplash.com/photo-1578310879709-6c6bb7b36d11?auto=format&fit=crop&w=800&q=80",
-    type: ["cultural", "nature", "relaxation"],
-    rating: 4.7,
+    title: "Visite des oasis de montagne de Tozeur",
+    description: "Explorez les magnifiques oasis de montagne et les palmiers luxuriants de Tozeur, avec ses sources d'eau naturelles et ses paysages à couper le souffle.",
+    location: "Tozeur, Tunisie",
+    price: 55,
+    duration: "6 heures",
+    image: "https://images.unsplash.com/photo-1509059852496-f3822ae057bf?auto=format&fit=crop&w=800&q=80",
+    type: ["nature", "cultural"],
+    rating: 4.6,
     groupSize: {
-      min: 1,
-      max: 10
+      min: 2,
+      max: 15
     }
   },
   {
@@ -57,7 +56,7 @@ export const activities: Activity[] = [
     location: "Désert du Sahara, Tunisie",
     price: 250,
     duration: "3 jours",
-    image: "https://images.unsplash.com/photo-1633096981568-5092c386658e?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1514917073844-5421669334c7?auto=format&fit=crop&w=800&q=80",
     type: ["adventure", "cultural", "sport"],
     rating: 4.9,
     groupSize: {
@@ -72,7 +71,7 @@ export const activities: Activity[] = [
     location: "Djerba - Tozeur, Tunisie",
     price: 350,
     duration: "4 jours",
-    image: "https://images.unsplash.com/photo-1570214476695-19bd467e6f7a?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1539651044670-315229da9d2f?auto=format&fit=crop&w=800&q=80",
     type: ["cultural", "gastronomy", "nature"],
     rating: 4.8,
     groupSize: {
