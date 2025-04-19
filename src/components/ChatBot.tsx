@@ -126,31 +126,16 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Sur combien de personnes dans votre groupe sont des coureurs ?",
+              text: "Quand souhaitez-vous voyager ? Sélectionnez vos dates préférées :",
               sender: "bot",
-              inputType: "runnersCount"
+              inputType: "date"
             }
           ]);
           setChatStep(2);
         });
         break;
 
-      case 2: // Runners count
-        simulateBotTyping(() => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              text: "Quand souhaitez-vous voyager ? Sélectionnez vos dates préférées :",
-              sender: "bot",
-              inputType: "date"
-            }
-          ]);
-          setChatStep(3);
-        });
-        break;
-
-      case 3: // Dates
+      case 2: // Dates
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -161,12 +146,29 @@ const ChatBot = () => {
               inputType: "groupSize"
             }
           ]);
+          setChatStep(3);
+        });
+        break;
+
+      case 3: // Group Size
+        simulateBotTyping(() => {
+          updatePreferences({ groupSize });
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Sur combien de personnes dans votre groupe sont des coureurs ?",
+              sender: "bot",
+              inputType: "runnersCount"
+            }
+          ]);
           setChatStep(4);
         });
         break;
 
-      case 4: // Group size
+      case 4: // Runners Count
         simulateBotTyping(() => {
+          updatePreferences({ runnersCount });
           setMessages((prev) => [
             ...prev,
             {
