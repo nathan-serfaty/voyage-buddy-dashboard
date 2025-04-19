@@ -84,6 +84,20 @@ const ChatBot = () => {
     }, 1000);
   };
 
+  const isFormComplete = () => {
+    return (
+      preferences.name &&
+      preferences.email &&
+      preferences.selectedCity &&
+      preferences.selectedActivities.length > 0 &&
+      preferences.budget &&
+      preferences.groupSize > 0 &&
+      preferences.dateRange.from &&
+      preferences.dateRange.to &&
+      preferences.specialRequirements !== undefined
+    );
+  };
+
   const processUserResponse = (message: Message) => {
     switch (chatStep) {
       case 0:
@@ -195,16 +209,31 @@ const ChatBot = () => {
       case 7:
         simulateBotTyping(() => {
           updatePreferences({ specialRequirements: message.text });
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              text: "Merci pour toutes ces informations ! Nous avons tout ce qu'il nous faut pour vous proposer un voyage sur mesure. Vous pouvez maintenant accéder à votre tableau de bord personnalisé pour voir nos recommandations.",
-              sender: "bot"
-            }
-          ]);
-          setChatStep(8);
-          setChatCompleted(true);
+          if (isFormComplete()) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                text: "Merci pour toutes ces informations ! Nous avons tout ce qu'il nous faut pour vous proposer un voyage sur mesure. Vous allez être redirigé vers votre tableau de bord personnalisé.",
+                sender: "bot"
+              }
+            ]);
+            setChatStep(8);
+            setChatCompleted(true);
+            setTimeout(() => {
+              navigate("/dashboard");
+            }, 2000);
+          } else {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: Date.now().toString(),
+                text: "Il semble que certaines informations sont manquantes. Pouvons-nous reprendre depuis le début ?",
+                sender: "bot"
+              }
+            ]);
+            setChatStep(0);
+          }
         });
         break;
       
@@ -348,20 +377,6 @@ const ChatBot = () => {
 
   const handleGoToDashboard = () => {
     navigate("/dashboard");
-  };
-
-  const isFormComplete = () => {
-    return (
-      preferences.name &&
-      preferences.email &&
-      preferences.selectedCity &&
-      preferences.selectedActivities.length > 0 &&
-      preferences.budget &&
-      preferences.groupSize > 0 &&
-      preferences.dateRange.from &&
-      preferences.dateRange.to &&
-      preferences.specialRequirements !== undefined
-    );
   };
 
   return (
