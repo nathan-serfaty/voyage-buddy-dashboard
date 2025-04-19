@@ -14,9 +14,11 @@ export interface UserPreferences {
   activityTypes: ActivityType[];
   budget: string;
   groupSize: number;
+  runnersCount: number;
   dateRange: DateRange;
   selectedActivities: string[];
   specialRequirements: string;
+  additionalComments: string;
 }
 
 const defaultPreferences: UserPreferences = {
@@ -26,9 +28,11 @@ const defaultPreferences: UserPreferences = {
   activityTypes: [],
   budget: "",
   groupSize: 1,
+  runnersCount: 0,
   dateRange: { from: undefined, to: undefined },
   selectedActivities: [],
-  specialRequirements: ""
+  specialRequirements: "",
+  additionalComments: ""
 };
 
 interface UserPreferencesContextType {

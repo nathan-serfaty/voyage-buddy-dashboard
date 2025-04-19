@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +22,7 @@ type Message = {
   id: string;
   text: string;
   sender: "bot" | "user";
-  inputType?: "cities" | "date" | "activities" | "groupSize" | "budget" | "special" | "email";
+  inputType?: "cities" | "date" | "activities" | "excursions" | "groupSize" | "runnersCount" | "budget" | "special" | "additionalComments" | "email";
 };
 
 const ChatBot = () => {
@@ -34,7 +33,9 @@ const ChatBot = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [groupSize, setGroupSize] = useState<number>(1);
+  const [runnersCount, setRunnersCount] = useState<number>(0);
   const [budget, setBudget] = useState<string>("");
+  const [additionalComments, setAdditionalComments] = useState<string>("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { updatePreferences, setChatCompleted, preferences } = useUserPreferences();
@@ -54,7 +55,7 @@ const ChatBot = () => {
   }, []);
 
   useEffect(() => {
-    if (chatStep === 7) {
+    if (chatStep === 9) {
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -110,16 +111,46 @@ const ChatBot = () => {
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Excellent ! Quand souhaitez-vous voyager ? Sélectionnez vos dates préférées :",
+              text: "Excellent ! Maintenant, découvrons quelles excursions vous intéressent le plus :",
               sender: "bot",
-              inputType: "date"
+              inputType: "excursions"
             }
           ]);
           setChatStep(1);
         });
         break;
       
-      case 1: // Dates
+      case 1: // Excursions
+        simulateBotTyping(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Sur combien de personnes dans votre groupe sont des coureurs ?",
+              sender: "bot",
+              inputType: "runnersCount"
+            }
+          ]);
+          setChatStep(2);
+        });
+        break;
+
+      case 2: // Runners count
+        simulateBotTyping(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              text: "Quand souhaitez-vous voyager ? Sélectionnez vos dates préférées :",
+              sender: "bot",
+              inputType: "date"
+            }
+          ]);
+          setChatStep(3);
+        });
+        break;
+
+      case 3: // Dates
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -130,11 +161,11 @@ const ChatBot = () => {
               inputType: "activities"
             }
           ]);
-          setChatStep(2);
+          setChatStep(4);
         });
         break;
 
-      case 2: // Activities
+      case 4: // Activities
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -145,11 +176,11 @@ const ChatBot = () => {
               inputType: "groupSize"
             }
           ]);
-          setChatStep(3);
+          setChatStep(5);
         });
         break;
 
-      case 3: // Group size
+      case 5: // Group size
         simulateBotTyping(() => {
           setMessages((prev) => [
             ...prev,
@@ -160,28 +191,28 @@ const ChatBot = () => {
               inputType: "budget"
             }
           ]);
-          setChatStep(4);
+          setChatStep(6);
         });
         break;
 
-      case 4: // Budget
+      case 6: // Special requirements
         simulateBotTyping(() => {
+          updatePreferences({ specialRequirements: message.text });
           setMessages((prev) => [
             ...prev,
             {
               id: Date.now().toString(),
-              text: "Avez-vous des exigences ou préférences particulières ? (ex: restrictions alimentaires, besoins d'accessibilité)",
+              text: "Y a-t-il d'autres choses que vous souhaiteriez nous faire parvenir ?",
               sender: "bot",
-              inputType: "special"
+              inputType: "additionalComments"
             }
           ]);
-          setChatStep(5);
+          setChatStep(7);
         });
         break;
 
-      case 5: // Special requirements
+      case 7: // Additional comments
         simulateBotTyping(() => {
-          updatePreferences({ specialRequirements: message.text });
           setMessages((prev) => [
             ...prev,
             {
@@ -191,13 +222,16 @@ const ChatBot = () => {
               inputType: "email"
             }
           ]);
-          setChatStep(6);
+          setChatStep(8);
         });
         break;
 
-      case 6: // Email
+      case 8: // Email
         simulateBotTyping(() => {
-          updatePreferences({ email: message.text });
+          updatePreferences({ 
+            email: message.text,
+            additionalComments: additionalComments 
+          });
           setMessages((prev) => [
             ...prev,
             {
@@ -206,7 +240,7 @@ const ChatBot = () => {
               sender: "bot"
             }
           ]);
-          setChatStep(7);
+          setChatStep(9);
           setChatCompleted(true);
           setTimeout(() => {
             navigate("/dashboard");
@@ -610,6 +644,116 @@ const ChatBot = () => {
           </div>
         );
 
+      case "excursions":
+        return (
+          <div className="mt-3 space-y-4">
+            <div className="grid grid-cols-1 gap-4">
+              {activities.map((activity) => (
+                <div key={activity.id} className="flex items-start space-x-3 p-4 rounded-lg border">
+                  <Checkbox
+                    id={activity.id}
+                    checked={selectedActivities.includes(activity.id)}
+                    onCheckedChange={() => handleActivitySelect(activity.id)}
+                  />
+                  <div>
+                    <Label htmlFor={activity.id} className="font-medium">{activity.title}</Label>
+                    <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Durée : {activity.duration} | Prix : {activity.price}€ par personne
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Button 
+              onClick={handleActivitiesSubmit}
+              disabled={selectedActivities.length === 0}
+            >
+              Valider
+            </Button>
+          </div>
+        );
+
+      case "runnersCount":
+        return (
+          <div className="mt-3 space-y-3">
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setRunnersCount(prev => Math.max(0, prev - 1))}
+              >
+                -
+              </Button>
+              <span className="text-xl font-medium">{runnersCount}</span>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setRunnersCount(prev => Math.min(groupSize, prev + 1))}
+              >
+                +
+              </Button>
+            </div>
+            <p className="text-sm text-gray-600">
+              Le nombre de coureurs ne peut pas dépasser la taille du groupe ({groupSize})
+            </p>
+            <Button onClick={() => {
+              updatePreferences({ runnersCount });
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: Date.now().toString(),
+                  text: `${runnersCount} coureur${runnersCount > 1 ? 's' : ''}`,
+                  sender: "user"
+                }
+              ]);
+              processUserResponse({
+                id: Date.now().toString(),
+                text: runnersCount.toString(),
+                sender: "user"
+              });
+            }}>
+              Valider
+            </Button>
+          </div>
+        );
+
+      case "additionalComments":
+        return (
+          <div className="mt-3 space-y-3">
+            <Textarea 
+              placeholder="Partagez avec nous vos attentes, questions ou besoins spécifiques..."
+              value={additionalComments}
+              onChange={(e) => setAdditionalComments(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <div className="flex justify-between">
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setAdditionalComments("Pas de commentaires additionnels");
+                  processUserResponse({
+                    id: Date.now().toString(),
+                    text: "Pas de commentaires additionnels",
+                    sender: "user"
+                  });
+                }}
+              >
+                Passer
+              </Button>
+              <Button onClick={() => {
+                processUserResponse({
+                  id: Date.now().toString(),
+                  text: additionalComments || "Pas de commentaires additionnels",
+                  sender: "user"
+                });
+              }}>
+                Valider
+              </Button>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -700,7 +844,7 @@ const ChatBot = () => {
         <div ref={messagesEndRef} />
       </div>
       
-      {chatStep === 6 ? (
+      {chatStep === 8 ? (
         <div className="p-4 border-t">
           <form
             onSubmit={(e) => {
@@ -720,14 +864,14 @@ const ChatBot = () => {
             </Button>
           </form>
         </div>
-      ) : chatStep === 7 && isFormComplete() ? (
+      ) : chatStep === 9 && isFormComplete() ? (
         <div className="p-4 border-t">
           <p className="text-center text-gray-600 mb-2">Redirection vers votre tableau de bord...</p>
           <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
             <div className="h-full bg-primary animate-progress" style={{ width: '100%' }} />
           </div>
         </div>
-      ) : chatStep === 7 ? (
+      ) : chatStep === 9 ? (
         <div className="p-4 border-t">
           <p className="text-center text-yellow-600">Veuillez compléter toutes les informations avant de continuer.</p>
         </div>
