@@ -54,7 +54,7 @@ const Auth = () => {
         }
         
         console.log("Superuser login successful", data);
-        navigate("/");
+        navigate("/admin");
         return;
       }
 

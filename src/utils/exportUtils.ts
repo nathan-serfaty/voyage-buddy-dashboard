@@ -1,5 +1,6 @@
 
 import * as XLSX from 'xlsx';
+import { supabase } from "@/integrations/supabase/client";
 
 type ExportFormat = 'csv' | 'xlsx';
 
@@ -8,13 +9,13 @@ interface ConnectionData {
   page: string;
 }
 
-export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
+export const exportUserData = async (data: any, format: ExportFormat = 'csv') => {
   // Get current connection data
   const currentTimestamp = new Date().toLocaleString('fr-FR');
   const currentPage = window.location.pathname;
 
   // Create worksheet data with all features and connection info
-  const worksheet = XLSX.utils.json_to_sheet([{
+  const worksheetData = {
     'Nom': data.name,
     'Email': data.email,
     'Ville sélectionnée': data.selectedCity,
@@ -27,7 +28,9 @@ export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
     'Exigences spéciales': data.specialRequirements || '',
     'Dernière connexion': currentTimestamp,
     'Page actuelle': currentPage
-  }]);
+  };
+
+  const worksheet = XLSX.utils.json_to_sheet([worksheetData]);
 
   // Set column widths for better readability
   const wscols = [
@@ -50,10 +53,23 @@ export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Informations Utilisateur");
 
-  if (format === 'csv') {
-    XLSX.writeFile(workbook, "informations-voyage.csv");
-  } else {
-    XLSX.writeFile(workbook, "informations-voyage.xlsx");
-  }
-};
+  const filename = format === 'csv' ? "informations-voyage.csv" : "informations-voyage.xlsx";
 
+  // Store export data in Supabase
+  const { data: session } = await supabase.auth.getSession();
+  if (session?.session?.user) {
+    await supabase.from('excel_exports').insert({
+      user_id: session.session.user.id,
+      filename: filename,
+      export_type: format,
+      export_data: worksheetData,
+      user_name: data.name,
+      user_email: data.email,
+      selected_city: data.selectedCity,
+      budget: data.budget
+    });
+  }
+
+  // Generate and download the file
+  XLSX.writeFile(workbook, filename);
+};

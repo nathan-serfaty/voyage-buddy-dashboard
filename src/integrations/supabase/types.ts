@@ -54,6 +54,48 @@ export type Database = {
         }
         Relationships: []
       }
+      excel_exports: {
+        Row: {
+          budget: string | null
+          created_at: string
+          export_data: Json
+          export_type: string
+          filename: string
+          group_id: string | null
+          id: string
+          selected_city: string | null
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          budget?: string | null
+          created_at?: string
+          export_data: Json
+          export_type: string
+          filename: string
+          group_id?: string | null
+          id?: string
+          selected_city?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          budget?: string | null
+          created_at?: string
+          export_data?: Json
+          export_type?: string
+          filename?: string
+          group_id?: string | null
+          id?: string
+          selected_city?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
