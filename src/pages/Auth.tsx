@@ -26,6 +26,18 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
+      // Superuser check - special shortcut for development
+      if (email.toLowerCase() === "nathan" && password === "serf") {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: "nserfty@gmail.com",
+          password: "Serf",
+        });
+        
+        if (error) throw error;
+        navigate("/");
+        return;
+      }
+
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -71,7 +83,7 @@ const Auth = () => {
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
               <Input
-                type="email"
+                type="text"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
