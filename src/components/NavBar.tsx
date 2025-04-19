@@ -33,7 +33,7 @@ const NavBar = () => {
   const navigation = [
     { name: "Accueil", href: "/", icon: <Compass className="h-5 w-5" /> },
     { name: "Activités", href: "/activities", icon: <MessageSquare className="h-5 w-5" /> },
-    { name: "Administration", href: "/admin", icon: <Users className="h-5 w-5" />, requiresAuth: true },
+    { name: "Administration", href: "/admin", icon: <Users className="h-5 w-5" /> },
     { name: "Tableau de bord", href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" />, requiresChat: true }
   ];
 
@@ -57,7 +57,9 @@ const NavBar = () => {
             <div className="flex items-center space-x-4">
               {navigation.map((item) => {
                 if (item.requiresChat && !chatCompleted) return null;
-                if (item.requiresAuth && !user) return null;
+                
+                // Only show admin link if user is logged in
+                if (item.name === "Administration" && !user) return null;
                 
                 const isActive = location.pathname === item.href;
                 return (
@@ -119,7 +121,9 @@ const NavBar = () => {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
             {navigation.map((item) => {
               if (item.requiresChat && !chatCompleted) return null;
-              if (item.requiresAuth && !user) return null;
+              
+              // Only show admin link if user is logged in
+              if (item.name === "Administration" && !user) return null;
               
               const isActive = location.pathname === item.href;
               return (
