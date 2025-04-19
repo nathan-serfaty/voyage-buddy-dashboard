@@ -1,15 +1,34 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Compass, MessageSquare, LayoutDashboard, Users } from "lucide-react";
+import { Menu, X, Compass, MessageSquare, LayoutDashboard, Users, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUserPreferences } from "@/contexts/UserPreferencesContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { chatCompleted } = useUserPreferences();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la déconnexion",
+      });
+    } else {
+      navigate("/");
+    }
+  };
 
   const navigation = [
     { name: "Accueil", href: "/", icon: <Compass className="h-5 w-5" /> },
@@ -34,11 +53,11 @@ const NavBar = () => {
           </div>
           
           {/* Desktop navigation */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex md:items-center md:space-x-4">
             <div className="flex items-center space-x-4">
               {navigation.map((item) => {
-                // Skip dashboard if chat is not completed
                 if (item.requiresChat && !chatCompleted) return null;
+                if (item.admin && !user) return null;
                 
                 const isActive = location.pathname === item.href;
                 return (
@@ -58,6 +77,19 @@ const NavBar = () => {
                 );
               })}
             </div>
+
+            {user ? (
+              <Button onClick={handleLogout} variant="outline">
+                Déconnexion
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button className="flex items-center">
+                  <LogIn className="h-5 w-5 mr-2" />
+                  Connexion
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -84,8 +116,8 @@ const NavBar = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
             {navigation.map((item) => {
-              // Skip dashboard if chat is not completed
               if (item.requiresChat && !chatCompleted) return null;
+              if (item.admin && !user) return null;
               
               const isActive = location.pathname === item.href;
               return (
@@ -105,6 +137,29 @@ const NavBar = () => {
                 </Link>
               );
             })}
+            {user ? (
+              <Button 
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }} 
+                variant="outline"
+                className="w-full justify-start"
+              >
+                Déconnexion
+              </Button>
+            ) : (
+              <Link 
+                to="/auth" 
+                className="block w-full" 
+                onClick={() => setIsOpen(false)}
+              >
+                <Button className="w-full flex items-center justify-start">
+                  <LogIn className="h-5 w-5 mr-2" />
+                  Connexion
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       )}
