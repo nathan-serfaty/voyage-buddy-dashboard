@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -274,22 +275,6 @@ const ChatBot = () => {
       }
       return [...prev, activityId];
     });
-    
-    updatePreferences({ selectedActivities: [...selectedActivities, activityId] });
-    
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        text: "Activité ajoutée à votre programme !",
-        sender: "bot"
-      }
-    ]);
-
-    setTimeout(() => {
-      setChatCompleted(true);
-      navigate("/dashboard");
-    }, 1500);
   };
 
   const handleActivitiesSubmit = () => {
@@ -338,6 +323,8 @@ const ChatBot = () => {
   };
 
   const handleBudgetSubmit = () => {
+    if (!budget) return;
+    
     updatePreferences({ budget });
     
     setMessages((prev) => [
