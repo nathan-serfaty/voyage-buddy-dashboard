@@ -3,8 +3,17 @@ import * as XLSX from 'xlsx';
 
 type ExportFormat = 'csv' | 'xlsx';
 
+interface ConnectionData {
+  timestamp: string;
+  page: string;
+}
+
 export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
-  // Create worksheet data with all features
+  // Get current connection data
+  const currentTimestamp = new Date().toLocaleString('fr-FR');
+  const currentPage = window.location.pathname;
+
+  // Create worksheet data with all features and connection info
   const worksheet = XLSX.utils.json_to_sheet([{
     'Nom': data.name,
     'Email': data.email,
@@ -15,7 +24,9 @@ export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
     'Date de début': data.dateRange.from ? new Date(data.dateRange.from).toLocaleDateString('fr-FR') : '',
     'Date de fin': data.dateRange.to ? new Date(data.dateRange.to).toLocaleDateString('fr-FR') : '',
     'Activités sélectionnées': data.selectedActivities.length,
-    'Exigences spéciales': data.specialRequirements || ''
+    'Exigences spéciales': data.specialRequirements || '',
+    'Dernière connexion': currentTimestamp,
+    'Page actuelle': currentPage
   }]);
 
   // Set column widths for better readability
@@ -29,7 +40,9 @@ export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
     { wch: 15 }, // Date début
     { wch: 15 }, // Date fin
     { wch: 20 }, // Activités sélectionnées
-    { wch: 40 }  // Exigences spéciales
+    { wch: 40 }, // Exigences spéciales
+    { wch: 25 }, // Dernière connexion
+    { wch: 20 }  // Page actuelle
   ];
 
   worksheet['!cols'] = wscols;
@@ -43,3 +56,4 @@ export const exportUserData = (data: any, format: ExportFormat = 'csv') => {
     XLSX.writeFile(workbook, "informations-voyage.xlsx");
   }
 };
+
