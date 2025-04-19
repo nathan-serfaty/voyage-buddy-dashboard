@@ -12,7 +12,7 @@ export const activities: Activity[] = [
     location: "Douz, Tunisie",
     price: 85,
     duration: "4 heures",
-    image: "https://images.unsplash.com/photo-1614607206234-f7578b49d147?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1618523388630-4d4339336234?auto=format&fit=crop&w=800&q=80",
     type: ["adventure", "nature"],
     rating: 4.8,
     groupSize: {
@@ -27,7 +27,7 @@ export const activities: Activity[] = [
     location: "Douz, Tunisie",
     price: 95,
     duration: "3 heures",
-    image: "https://images.unsplash.com/photo-1621542400000-c2f526050aba?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1624809572365-7574d0c51339?auto=format&fit=crop&w=800&q=80",
     type: ["adventure", "nature"],
     rating: 4.9,
     groupSize: {
@@ -42,7 +42,7 @@ export const activities: Activity[] = [
     location: "Douz, Tunisie",
     price: 65,
     duration: "2 heures",
-    image: "https://images.unsplash.com/photo-1589197331516-4d84b72bbdd1?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1578310879709-6c6bb7b36d11?auto=format&fit=crop&w=800&q=80",
     type: ["cultural", "nature", "relaxation"],
     rating: 4.7,
     groupSize: {
@@ -57,7 +57,7 @@ export const activities: Activity[] = [
     location: "Désert du Sahara, Tunisie",
     price: 250,
     duration: "3 jours",
-    image: "https://images.unsplash.com/photo-1509773896068-7fd215dff1b8?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1633096981568-5092c386658e?auto=format&fit=crop&w=800&q=80",
     type: ["adventure", "cultural", "sport"],
     rating: 4.9,
     groupSize: {
@@ -72,7 +72,7 @@ export const activities: Activity[] = [
     location: "Djerba - Tozeur, Tunisie",
     price: 350,
     duration: "4 jours",
-    image: "https://images.unsplash.com/photo-1548019979-dbe68b50ac1e?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1570214476695-19bd467e6f7a?auto=format&fit=crop&w=800&q=80",
     type: ["cultural", "gastronomy", "nature"],
     rating: 4.8,
     groupSize: {
@@ -102,7 +102,7 @@ export const activities: Activity[] = [
     location: "Désert Tunisien",
     price: 180,
     duration: "1-3 jours",
-    image: "https://images.unsplash.com/photo-1542401886-65d6c61db217?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1682686580003-82b6c0e9d82d?auto=format&fit=crop&w=800&q=80",
     type: ["adventure", "cultural", "teambuilding"],
     rating: 4.9,
     groupSize: {
