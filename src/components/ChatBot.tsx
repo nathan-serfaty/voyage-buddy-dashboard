@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { cities } from "@/data/cities";
 import { activities } from "@/data/activities";
 import { Activity } from "@/types/activity";
+import { Textarea } from "@/components/ui/textarea";
 import Map from "@/components/Map";
 
 type Message = {
